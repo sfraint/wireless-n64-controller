@@ -1,7 +1,7 @@
 # Wireless controller bill of materials
 Note: as mentioned elsewhere, you *could* skip having a battery pak and wire a battery directly to the controller, but you'll still need to somehow secure the battery (e.g. electrical tape). *I also assume you already have soldering equipment and some ~30 gauge wire to wire up components.*
 
-Important note: the links below are just to serve as a reference. You can use equivalent items that better suit your needs, like bulk packs, cheaper or higher capacity battery, etc.
+*Also note: the links below are just to serve as a reference. You can use equivalent items that better suit your needs, like bulk packs, cheaper or higher capacity battery, etc.*
 
 The total price of building 1 controller is around or slightly above a similar off-the-shelf wireless controller at ~$60, but you could produce ~4 of them for closer to ~$35 per controller (since shipping doesn't scale up with more items purchased and some things like battery terminals and PCBs really only come in multi-packs).
 
