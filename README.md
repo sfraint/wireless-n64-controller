@@ -63,7 +63,7 @@ A custom PCB was built to replace the existing controller PCB, mainly to a) make
 
 <img src=images/pcb.png width=720>
 
-<img src=images/controller_internals.jpg width=720>
+<img src=images/installed_pcb.jpg width=720>
 
 ### Battery Pak
 A 3d-printed battery pack that fits into the controller "pak" port was used to supply power to the controller, since it can no longer pull power from the controller cable.
