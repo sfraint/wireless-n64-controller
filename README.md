@@ -1,5 +1,5 @@
 # wireless-n64-controller
-This project and its documentation is a Work-In-Progress. I'm still working out kinks in the design files and prototypes, and I'm still working on writing everything down.
+This project and its documentation is a Work-In-Progress. I'm still working on writing everything down and working out kinks in the design files and prototypes.
 
 **The idea is to publish the design files and software I used to upgrade a cheap, wired N64 controller to a wireless, Bluetooth controller**. Hopefully these published files can assist others in completing similar projects.
 
