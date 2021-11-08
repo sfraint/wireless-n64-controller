@@ -3,7 +3,11 @@ Note: as mentioned elsewhere, you *could* skip having a battery pak and wire a b
 
 *Also note: the links below are just to serve as a reference. You can use equivalent items that better suit your needs, like bulk packs, cheaper or higher capacity battery, etc.*
 
-The total price of building 1 controller is around or slightly above a similar off-the-shelf wireless controller at ~$60, but you could produce ~4 of them for closer to ~$35 per controller (since shipping doesn't scale up with more items purchased and some things like battery terminals and PCBs really only come in multi-packs).
+----
+
+The total price of building 1 controller is around or slightly above a similar off-the-shelf wireless controller at ~$60, but you could produce ~4 of them for closer to $30 or $35 per controller (since many items only come in multi-packs, e.g. PCBs; and buying in "bulk" saves on shipping costs).
+
+If you can 3d print your own battery pak case, you can shave ~$14 off the estimated single-controller price. Also, I'm working on a slightly simpler design using a cheaper ESP32 board that also removes the boost converter, which will cut off another ~$1-2 and require fewer components, connections, and soldering.
 
 ## Controller parts
 
@@ -11,7 +15,7 @@ Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
 N64 USB controller | 1 | [Link](https://www.amazon.com/Classic-Controller-iNNEXT-Joystick-Raspberry/dp/B0744DW55H) | $12.00 | 
 --- | --- | --- | --- | ---
-ESP32 | 1 | [Link](https://www.aliexpress.com/item/32864722159.html) | $3.31 | 
+ESP32 (e.g. CH9102X) | 1 | [Link](https://www.aliexpress.com/item/32864722159.html) | $3.31 | 
 Mini boost converter board | 1 | [Link](https://www.aliexpress.com/item/4000322419351.html) | $0.65 | 
 Shipping | --- | --- | ~$2.50 | 
 --- | --- | --- | --- | ---
@@ -19,7 +23,7 @@ PCB | 1 | [Link**](https://github.com/sfraint/wireless-n64-controller/blob/main/
 --- | --- | --- | --- | ---
 **Total** | --- | --- | ~$33.46 | 
 
-You can also optionally buy JST headers to solder on to the board, to make the off-board connections more modular and cleaner.
+You can also optionally buy JST headers and cables to solder on to the boards, to make the off-board connections more modular and cleaner.
 
 ## Battery pak parts
 
