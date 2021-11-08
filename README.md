@@ -1,7 +1,7 @@
 # wireless-n64-controller
 This project and its documentation is a Work-In-Progress. I'm still working out kinks in the design files and prototypes, and I'm still working on writing everything down.
 
-The idea is to publish the design files and software I used to upgrade a cheap, wired N64 controller to a wireless, Bluetooth controller; hopefully these published files can assist others in completing similar projects.
+**The idea is to publish the design files and software I used to upgrade a cheap, wired N64 controller to a wireless, Bluetooth controller**. Hopefully these published files can assist others in completing similar projects.
 
 <img src=images/controller_prototype.jpg width=720>
 
@@ -15,15 +15,15 @@ Detailed building instructions **TODO**.
 
 *Note: this project requires soldering and some basic understanding of electriconics and circuits. I also assume you already have soldering equipment and some ~30 gauge wire to wire up components.*
 
-The following is a high-level list of steps to build your own wireless controller:
+### Steps
 
 1. Purchase the base parts. See the [BOM for more details and links](https://github.com/sfraint/wireless-n64-controller/blob/main/BOM.md).
-  1. Base N64 controller you plan to modify. I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
-  2. ESP32 microcontroller
-  3. 5V regulator
-  4. AAA terminals
-  5. LiPo battery
-  6. LiPo battery charging board
+   * Base N64 controller you plan to modify. I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
+   * ESP32 microcontroller
+   * 5V regulator
+   * AAA terminals
+   * LiPo battery
+   * LiPo battery charging board
 
 2. Print the PCB.
 
