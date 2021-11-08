@@ -78,7 +78,7 @@ Rough performance numbers for the initial prototype controller are:
 
 1. battery lifetime - using a ~1500 mAh lithium polymer battery, I expect the controller to last about ~15 hours of continuous use; I'm less sure about low-power mode lifetime, but probably a few weeks (longer if you just detach the battery).
 
-2. controller latency - over 100 sequential button presses had a latency of between 2 and 13 ms
+2. controller latency - over 100 sequential button presses had a latency of between 2 and 13 ms (plus an additional ~2 ms for current software's polling interval - can reduce this using interrupts instead of polling, though chances are analog/jostick inputs will always suffer this extra latency)
   <img src=images/button_press_latency.png width=720>
 
 
