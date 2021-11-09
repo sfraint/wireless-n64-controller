@@ -79,6 +79,14 @@ Rough performance numbers for the initial prototype controller are:
 1. battery lifetime - using a ~1500 mAh lithium polymer battery, I expect the controller to last about ~15 hours of continuous use; I'm less sure about low-power mode lifetime, but probably a few weeks (longer if you just detach the battery).
 
 2. controller latency - over 100 sequential button presses had a latency of between 2 and 13 ms (plus an additional ~2 ms for current software's polling interval - can reduce this using interrupts instead of polling, though chances are analog/jostick inputs will always suffer this extra latency)
+
+   To measure approximate latency, I setup a second ESP32 which was:
+   
+   * a BLE client subscribed to the gamepad reports
+
+   * running a GPIO interrupt to detect the button press
+
+   Then, the second ESP32 recorded the time the button-interrupt was received as well as the time the BLE button-press-report was received. Got the approximate latency by subtracting the interrupt time from the BLE report time.
   <img src=images/button_press_latency.png width=720>
 
 
