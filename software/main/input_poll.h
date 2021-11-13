@@ -27,7 +27,7 @@
 #define ANALOG_OFFSET_X        125
 #define ANALOG_OFFSET_Y        165
 // Amount of analog change to allow before calling the value changed (post scaling)
-#define ANALOG_DRIFT         800
+#define ANALOG_DRIFT         200
 
 #define BTN_START      0
 #define BTN_Z          1

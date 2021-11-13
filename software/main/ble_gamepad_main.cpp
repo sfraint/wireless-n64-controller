@@ -152,7 +152,7 @@ void setup_tasks()
   gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
   xTaskCreate(gpio_button_handler, "gpio_button_handler", 2048, NULL, 10, NULL);
   xTaskCreate(led_handler, "led_handler", 2048, NULL, 10, NULL);
-  xTaskCreate(input_poll_loop, "in_poll", 2048, NULL, 10, NULL);
+  xTaskCreate(input_poll_loop, "in_poll", 4096, NULL, 10, NULL);
 }
 
 

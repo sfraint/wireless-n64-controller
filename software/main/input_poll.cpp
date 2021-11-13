@@ -11,6 +11,9 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
+
+#include "debug.h"
+
 uint32_t buttonPins[NUM_OF_BUTTONS] = {
     36, 35, 32, 14, 12, 13,     // Right side pins
     23, 22, 21, 19, 18, 17, 16  // Left side pins
@@ -99,14 +102,14 @@ void input_poll_loop(void* args)
     // Joystick
     currentXState = get_analog(ANALOG_X, ANALOG_OFFSET_X);
     if ((currentXState - ANALOG_DRIFT > previousXState) || (currentXState + ANALOG_DRIFT < previousXState)) {
-      printf(" ADC1_X: %d\n", currentXState);
+      debug(" ADC1_X: %d\n", currentXState);
       previousXState = currentXState;
       bleGamepad.setX(currentXState);
       changed = true;
     }
     currentYState = get_analog(ANALOG_Y, ANALOG_OFFSET_Y);
     if ((currentYState - ANALOG_DRIFT > previousYState) || (currentYState + ANALOG_DRIFT < previousYState)) {
-      printf(" ADC1_Y: %d\n", currentYState);
+      debug(" ADC1_Y: %d\n", currentYState);
       previousYState = currentYState;
       bleGamepad.setY(currentYState);
       changed = true;
@@ -123,7 +126,7 @@ void input_poll_loop(void* args)
         changed = true;
         if(!ENABLE_HAT_DPAD) {
           if(currentDpadStates[i] == 1) {
-            printf("press DPAD %d (%d)", i, NUM_OF_BUTTONS + i);
+            debug("press DPAD %d (%d)", i, NUM_OF_BUTTONS + i);
             bleGamepad.press(NUM_OF_BUTTONS + i);
           } else {
             bleGamepad.release(NUM_OF_BUTTONS + i);
@@ -154,25 +157,25 @@ void input_poll_loop(void* args)
     gettimeofday(&tv, &tz);
     int timeTakenPrePrint = tv.tv_usec - start;
     if (changed) {
-      printf("Button states changed:\n");
-      printf("        SZLBA?      RtDLUR\n");
-      printf(" RIGHT: ");
+      //printf("Button states changed:\n");
+      debug("        SZLBA?      RtDLUR\n");
+      debug(" RIGHT: ");
       for (uint32_t i = 0 ; i < NUM_OF_BUTTONS_RIGHT ; i++) {
         previousButtonStates[i] = currentButtonStates[i];
-        printf("%d", currentButtonStates[i]);
+        debug("%d", currentButtonStates[i]);
       }
-      printf(" LEFT: ");
+      debug(" LEFT: ");
       for (uint32_t i = NUM_OF_BUTTONS_RIGHT ; i < NUM_OF_BUTTONS ; i++) {
         previousButtonStates[i] = currentButtonStates[i];
-        printf("%d", currentButtonStates[i]);
+        debug("%d", currentButtonStates[i]);
       }
-      printf(" Dpad: ");
+      debug(" Dpad: ");
       for (uint32_t i = 0 ; i < 4 ; i++) {
         previousDpadStates[i] = currentDpadStates[i];
-        printf("%d", currentDpadStates[i]);
+        debug("%d", currentDpadStates[i]);
       }
-      printf(" (hat encoded: %d)", encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
-      printf("\n");
+      debug(" (hat encoded: %d)", encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
+      debug("\n");
       
       if (bleGamepad.isConnected()) {
         printf("Sending report ");
@@ -183,9 +186,9 @@ void input_poll_loop(void* args)
       }
       gettimeofday(&tv, &tz);
       int timeTakenTotal = tv.tv_usec - start;
-      printf("ANALOG TIME:   %d", timeTakenAnalog >> 10);
-      printf("PREPRINT TIME: %d", timeTakenPrePrint >> 10);
-      printf("TOTAL TIME:    %d", timeTakenTotal >> 10);
+      debug("ANALOG TIME:   %d\n", timeTakenAnalog >> 10);
+      debug("PREPRINT TIME: %d\n", timeTakenPrePrint >> 10);
+      printf("TOTAL TIME:    %d\n", timeTakenTotal >> 10);
     }
 
 
@@ -194,7 +197,7 @@ void input_poll_loop(void* args)
     if (mgmt_level == 0) {
         // Button released
         if (pressed && held >= BUTTON_PRESS_THRESH) {
-            printf("Button released!\n");
+            debug("Button released!\n");
             uint32_t status = BUTTON_UNPRESS;
             xQueueSend(gpio_evt_queue, &status, NULL);
             led_mode = LED_OFF;
@@ -215,17 +218,17 @@ void input_poll_loop(void* args)
         button_press_event = BUTTON_VERY_LONG_PRESS;
         xQueueSend(gpio_evt_queue, &button_press_event, NULL);
         led_mode = LED_BLINK_SLOW;
-        printf("Button very long pressed!\n");
+        debug("Button very long pressed!\n");
     } else if (held == BUTTON_LONG_PRESS_THRESH) {
         button_press_event = BUTTON_LONG_PRESS;
         xQueueSend(gpio_evt_queue, &button_press_event, NULL);
         led_mode = LED_BLINK_MED;
-        printf("Button long pressed!\n");
+        debug("Button long pressed!\n");
     } else if (held == BUTTON_PRESS_THRESH) {
         button_press_event = BUTTON_PRESS;
         xQueueSend(gpio_evt_queue, &button_press_event, NULL);
         led_mode = LED_BLINK_FAST;
-        printf("Button pressed!\n");
+        debug("Button pressed!\n");
     }
     vTaskDelay(xDelay);
   }
