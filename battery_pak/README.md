@@ -1,4 +1,6 @@
 ## Battery Pak
+This was designed with FreeCAD version 0.19.
+
 The battery pak assembly used in this project is made up of three pieces:
 
 1. Terminal block - this is the small piece that stays in the pak-port of the controller
