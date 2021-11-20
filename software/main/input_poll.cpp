@@ -11,13 +11,27 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
-
+//#define DEBUG 1
 #include "debug.h"
 
+
+// To change pins, update #define's in input_poll.h
 uint32_t buttonPins[NUM_OF_BUTTONS] = {
-    36, 35, 32, 14, 12, 13,     // Right side pins
-    23, 22, 21, 19, 18, 17, 16  // Left side pins
+    BTN_A_PIN,
+    BTN_B_PIN,
+    BTN_C_DOWN_PIN,
+    BTN_C_LEFT_PIN,
+    BTN_C_UP_PIN,
+    BTN_C_RIGHT_PIN,
+    BTN_START_PIN,
+    BTN_Z_PIN,
+    BTN_L_PIN,
+    BTN_R_PIN,
+    BTN_IDK1_PIN,
+    BTN_IDK2_PIN,
+    BTN_IDK3_PIN
 };
+
 uint32_t previousButtonStates[NUM_OF_BUTTONS];
 uint32_t currentButtonStates[NUM_OF_BUTTONS];
 int16_t previousXState;
@@ -29,7 +43,6 @@ int16_t currentYState;
 uint32_t previousDpadStates[4];
 uint32_t currentDpadStates[4];
 uint32_t dpadPins[4] = {25, 27, 26, 33};
-uint32_t physicalButtons[NUM_OF_BUTTONS] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
 
 
 // Scale x from `in` range to `out` range
@@ -146,11 +159,13 @@ void input_poll_loop(void* args)
       if (currentButtonStates[currentIndex] != previousButtonStates[currentIndex]) {
         changed = true;
         if(currentButtonStates[currentIndex] == 1) {
-          bleGamepad.press(physicalButtons[currentIndex]);
+          // Button numbers are 1-indexed
+          bleGamepad.press(currentIndex + 1);
         } else {
-          bleGamepad.release(physicalButtons[currentIndex]);
+          // Button numbers are 1-indexed
+          bleGamepad.release(currentIndex + 1);
         }
-      } 
+      }
     }
 
 
@@ -158,13 +173,13 @@ void input_poll_loop(void* args)
     int timeTakenPrePrint = tv.tv_usec - start;
     if (changed) {
       //printf("Button states changed:\n");
-      debug("        SZLBA?      RtDLUR\n");
-      debug(" RIGHT: ");
+      debug("        123456        789AB\n");
+      debug(" Group1 ");
       for (uint32_t i = 0 ; i < NUM_OF_BUTTONS_RIGHT ; i++) {
         previousButtonStates[i] = currentButtonStates[i];
         debug("%d", currentButtonStates[i]);
       }
-      debug(" LEFT: ");
+      debug(" Group2 ");
       for (uint32_t i = NUM_OF_BUTTONS_RIGHT ; i < NUM_OF_BUTTONS ; i++) {
         previousButtonStates[i] = currentButtonStates[i];
         debug("%d", currentButtonStates[i]);

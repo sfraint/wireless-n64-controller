@@ -20,6 +20,8 @@
 // Button state for gamepad buttons
 #define NUM_OF_BUTTONS_RIGHT 6
 #define NUM_OF_BUTTONS       13
+// "Soft-buttons" are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
+#define NUM_OF_SOFT_BUTTONS  3
 #define ANALOG_X             ADC1_CHANNEL_3  
 #define ANALOG_Y             ADC1_CHANNEL_6
 // TODO add calibration function
@@ -29,17 +31,22 @@
 // Amount of analog change to allow before calling the value changed (post scaling)
 #define ANALOG_DRIFT         200
 
-#define BTN_START      0
-#define BTN_Z          1
-#define BTN_L          2
-#define BTN_B          3
-#define BTN_A          4
-#define BTN_IDK        5
-#define BTN_R          6
-#define BTN_C_DOWN     7
-#define BTN_C_LEFT     8
-#define BTN_C_UP       9
-#define BTN_C_RIGHT    10
+// Define which pins are used for each button
+// Right side pins
+#define BTN_START_PIN      36
+#define BTN_Z_PIN          35
+#define BTN_L_PIN          32
+#define BTN_B_PIN          14
+#define BTN_A_PIN          12
+#define BTN_IDK1_PIN       13
+// Left side pins
+#define BTN_R_PIN          23
+#define BTN_C_DOWN_PIN     22
+#define BTN_C_LEFT_PIN     21
+#define BTN_C_UP_PIN       19
+#define BTN_C_RIGHT_PIN    18
+#define BTN_IDK2_PIN       17
+#define BTN_IDK3_PIN       16
 
 // Button state for management button
 #define MGMT_IO_PIN            2

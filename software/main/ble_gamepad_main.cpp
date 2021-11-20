@@ -70,10 +70,9 @@ void setup_gpio()
 }
 
 void setup_bt() {
-  uint32_t count = NUM_OF_BUTTONS + 4;
+  uint32_t count = NUM_OF_BUTTONS + NUM_OF_SOFT_BUTTONS;
   uint32_t hat_count = 0;
   if (ENABLE_HAT_DPAD) {
-    count = NUM_OF_BUTTONS;
     hat_count = 2;
   }
   printf("Setting up BT controller w/ %d buttons (hat dpad %d, hat count %d)", count, ENABLE_HAT_DPAD, hat_count);
