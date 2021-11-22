@@ -11,7 +11,7 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
-//#define DEBUG 1
+#define DEBUG 1
 #include "debug.h"
 
 
@@ -32,8 +32,18 @@ uint32_t buttonPins[NUM_OF_BUTTONS] = {
     BTN_IDK3_PIN
 };
 
+// "Soft" buttons
+// To change physical button reference, update #define's in input_poll.h
+uint32_t softButtonRefs[NUM_OF_SOFT_BUTTONS] = {
+    BTN_SOFT_SELECT,
+    BTN_SOFT_ALT1,
+    BTN_SOFT_ALT2
+};
+
 uint32_t previousButtonStates[NUM_OF_BUTTONS];
 uint32_t currentButtonStates[NUM_OF_BUTTONS];
+uint32_t previousSoftButtonStates[NUM_OF_SOFT_BUTTONS];
+uint32_t currentSoftButtonStates[NUM_OF_SOFT_BUTTONS];
 int16_t previousXState;
 int16_t currentXState;
 int16_t previousYState;
@@ -167,6 +177,44 @@ void input_poll_loop(void* args)
         }
       }
     }
+    
+    // "Soft" buttons
+    // TODO improve `changed` logic to detect soft-button resetting other buttons
+    // Assume if all Dpad buttons are pressed, that we're in soft-button mode
+    if (currentDpadStates[0] == 1 && currentDpadStates[1] == 1 && currentDpadStates[2] == 1 && currentDpadStates[3] == 1) {
+    
+      // Reset dpad
+      // Do I need to set both hats?
+      bleGamepad.setHat(encode_hat(0,0,0,0));
+      bleGamepad.setHat2(encode_hat(0,0,0,0));
+      currentDpadStates[0] = 0;
+      currentDpadStates[1] = 0;
+      currentDpadStates[2] = 0;
+      currentDpadStates[3] = 0;
+
+      for (uint32_t i = 0; i < NUM_OF_SOFT_BUTTONS; i++) {
+        uint32_t ref = softButtonRefs[i];
+        if (currentButtonStates[ref] == 1) {
+          debug(" soft button %d pressed\n", i);
+          currentSoftButtonStates[i] = 1;
+          bleGamepad.press(NUM_OF_BUTTONS + i + 1);
+          
+          // Don't allow both the phsycal and soft-button to be pressed
+          currentButtonStates[ref] = 0;
+          bleGamepad.release(ref + 1);
+        } else {
+          currentSoftButtonStates[i] = 0;
+          bleGamepad.release(NUM_OF_BUTTONS + i + 1);
+        }
+        if (currentSoftButtonStates[i] != previousSoftButtonStates[i]) changed = true;
+      }
+    } else {
+      for (uint32_t i = 0; i < NUM_OF_SOFT_BUTTONS; i++) {
+        currentSoftButtonStates[i] = 0;
+        bleGamepad.release(NUM_OF_BUTTONS + i + 1);
+        if (currentSoftButtonStates[i] != previousSoftButtonStates[i]) changed = true;
+      }
+    }
 
 
     gettimeofday(&tv, &tz);
@@ -190,6 +238,11 @@ void input_poll_loop(void* args)
         debug("%d", currentDpadStates[i]);
       }
       debug(" (hat encoded: %d)", encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
+      debug(" soft buttons: ");
+      for (uint32_t i = 0 ; i < NUM_OF_SOFT_BUTTONS ; i++) {
+        previousSoftButtonStates[i] = currentSoftButtonStates[i];
+        debug("%d", currentSoftButtonStates[i]);
+      }
       debug("\n");
       
       if (bleGamepad.isConnected()) {

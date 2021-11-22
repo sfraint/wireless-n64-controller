@@ -20,7 +20,7 @@
 // Button state for gamepad buttons
 #define NUM_OF_BUTTONS_RIGHT 6
 #define NUM_OF_BUTTONS       13
-// "Soft-buttons" are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
+// "Soft" buttons are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
 #define NUM_OF_SOFT_BUTTONS  3
 #define ANALOG_X             ADC1_CHANNEL_3  
 #define ANALOG_Y             ADC1_CHANNEL_6
@@ -47,6 +47,11 @@
 #define BTN_C_RIGHT_PIN    18
 #define BTN_IDK2_PIN       17
 #define BTN_IDK3_PIN       16
+// "Soft" buttons logical button number reference
+// Number reference points to position in the `buttonPins` array in input_poll.cpp
+#define BTN_SOFT_SELECT    6
+#define BTN_SOFT_ALT1      0
+#define BTN_SOFT_ALT2      1
 
 // Button state for management button
 #define MGMT_IO_PIN            2
@@ -67,6 +72,8 @@
 extern uint32_t buttonPins[NUM_OF_BUTTONS];
 extern uint32_t previousButtonStates[NUM_OF_BUTTONS];
 extern uint32_t currentButtonStates[NUM_OF_BUTTONS];
+extern uint32_t previousSoftButtonStates[NUM_OF_SOFT_BUTTONS];
+extern uint32_t currentSoftButtonStates[NUM_OF_SOFT_BUTTONS];
 extern int16_t previousXState;
 extern int16_t currentXState;
 extern int16_t previousYState;
