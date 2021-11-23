@@ -16,14 +16,21 @@
 // Whether or not the Dpad is treated as a HAT or just four buttons
 #define ENABLE_HAT_DPAD      1
 
+// Whether or not to measure and update battery level
+#define ENABLE_BATTERY_CHECK 0
+// Empirically measured with test ESP32 setup, assuming full battery is 4.2V and empty is 3.6V
+// Also, assuming battery voltage is cut in half before passing into ESP32
+#define BATTERY_LEVEL_EMPTY  2020
+#define BATTERY_LEVEL_FULL   2355
 
 // Button state for gamepad buttons
 #define NUM_OF_BUTTONS_RIGHT 6
 #define NUM_OF_BUTTONS       13
 // "Soft" buttons are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
 #define NUM_OF_SOFT_BUTTONS  3
-#define ANALOG_X             ADC1_CHANNEL_3  
+#define ANALOG_X             ADC1_CHANNEL_3
 #define ANALOG_Y             ADC1_CHANNEL_6
+#define ANALOG_BAT           ADC1_CHANNEL_5
 // TODO add calibration function
 // Amount to add to analog readings (pre scaling)
 #define ANALOG_OFFSET_X        125
@@ -78,6 +85,7 @@ extern int16_t previousXState;
 extern int16_t currentXState;
 extern int16_t previousYState;
 extern int16_t currentYState;
+extern int16_t currentBattState;
 
 
 // Up, down, left, right

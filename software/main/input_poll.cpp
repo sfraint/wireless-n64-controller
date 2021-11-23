@@ -11,7 +11,7 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
-#define DEBUG 1
+//#define DEBUG 1
 #include "debug.h"
 
 
@@ -48,6 +48,7 @@ int16_t previousXState;
 int16_t currentXState;
 int16_t previousYState;
 int16_t currentYState;
+int16_t currentBattState = 100;
 
 // Up, down, left, right
 uint32_t previousDpadStates[4];
@@ -100,6 +101,18 @@ signed char encode_hat(uint32_t up, uint32_t down, uint32_t left, uint32_t right
   return 0;
 }
 
+uint8_t get_battery_level() {
+  uint16_t rawBatt = adc1_get_raw(ANALOG_BAT);
+  if (rawBatt > BATTERY_LEVEL_FULL) {
+    currentBattState = 100;
+  } else if (rawBatt < BATTERY_LEVEL_EMPTY) {
+    currentBattState = 0;
+  } else {
+    currentBattState = map(rawBatt, BATTERY_LEVEL_EMPTY, BATTERY_LEVEL_FULL, 0, 100);
+  }
+  return (uint8_t) currentBattState;
+}
+
 
 // Poll joystick and button inputs
 void input_poll_loop(void* args)
@@ -121,6 +134,11 @@ void input_poll_loop(void* args)
     counter += 1;
     uint32_t mgmt_level = gpio_get_level((gpio_num_t) MGMT_IO_PIN);
     bool changed = false;
+    
+    // Battery
+    if (ENABLE_BATTERY_CHECK) {
+      bleGamepad.setBatteryLevel(get_battery_level());
+    }
 
     // Joystick
     currentXState = get_analog(ANALOG_X, ANALOG_OFFSET_X);
