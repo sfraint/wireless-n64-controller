@@ -20,7 +20,6 @@ Detailed building instructions **TODO**.
 1. Purchase the base parts. See the [BOM for more details and links](https://github.com/sfraint/wireless-n64-controller/blob/main/BOM.md).
    * Base N64 controller you plan to modify. I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
    * ESP32 microcontroller
-   * 5V regulator
    * AAA terminals
    * LiPo battery
    * LiPo battery charging board
@@ -61,7 +60,7 @@ It is also capable of a few other things like: tracking battery level, resetting
 ### PCB
 A custom PCB was built to replace the existing controller PCB, mainly to a) make space for the ESP32 dev board I used and b) reduce the amount of soldering required.
 
-<img src=images/pcb.png width=720>
+<img src=images/pcb_front.jpg width=720>
 
 <img src=images/installed_pcb.jpg width=720>
 
