@@ -16,3 +16,9 @@ The pak itself contains a lithium polymer battery, charging circuitry, and batte
 
 The 3d models are also on [thingiverse](https://www.thingiverse.com/thing:5028827).
 
+### Ordering
+
+It is relatively cheap to print a part like this if you or a friend have a 3d printer, otherwise you're going to have to pay a shop (and likely pay for shipping), which makes the battery "pak" one of the most expensive pieces in this project.
+
+If you do have to order from a shop, there are a lot online that will print and ship these parts for < $20.
+

@@ -5,9 +5,9 @@ Note: as mentioned elsewhere, you *could* skip having a battery pak and wire a b
 
 ----
 
-The total price of building 1 controller is around or slightly above a similar off-the-shelf wireless controller at ~$60, but you could produce ~4 of them for closer to $30 or $35 per controller (since many items only come in multi-packs, e.g. PCBs; and buying in "bulk" saves on shipping costs).
+If you can print or build your own battery "pak", the total project price should be < $50 for a single controller or < $90 for 4.
 
-If you can 3d print your own battery pak case, you can shave ~$14 off the estimated single-controller price. Also, I'm working on a slightly simpler design using a cheaper ESP32 board that also removes the boost converter, which will cut off another ~$1-2 and require fewer components, connections, and soldering.
+Otherwise the total price of building 1 controller is around or slightly above a similar off-the-shelf wireless controller at ~$60, but you could still produce ~4 of them for closer to $30 or $35 per controller (since many items only come in multi-packs, e.g. PCBs, battery terminals; and buying in "bulk" saves on shipping costs).
 
 ## Controller parts
 
@@ -15,21 +15,35 @@ Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
 N64 USB controller | 1 | [Link](https://www.amazon.com/Classic-Controller-iNNEXT-Joystick-Raspberry/dp/B0744DW55H) | $12.00 | 
 --- | --- | --- | --- | ---
-ESP32 (e.g. CH9102X) | 1 | [Link](https://www.aliexpress.com/item/32864722159.html) | $3.31 | 
-Mini boost converter board | 1 | [Link](https://www.aliexpress.com/item/4000322419351.html) | $0.65 | 
-Shipping | --- | --- | ~$2.50 | 
+ESP32 Lolin32 Lite | 1 | [Link](https://www.aliexpress.com/item/4000038780903.html) | $2.67 | These are "discontinued" but I've found them readily avaialble and one of the most cost-effective uControllers for this project
+Shipping | --- | --- | ~$1.50 | 
 --- | --- | --- | --- | ---
-PCB | 1 | [Link**](https://github.com/sfraint/wireless-n64-controller/blob/main/pcb/ordering.md) | ~$15 | **See link for details
+PCB | 1 | [Link**](https://github.com/sfraint/wireless-n64-controller/blob/main/pcb/ordering.md) | ~$15 (for 5, shipped) | **See link for details
 --- | --- | --- | --- | ---
-**Total** | --- | --- | ~$33.46 | 
+**Total** | --- | --- | ~$31 | 
 
-You can also optionally buy JST headers and cables to solder on to the boards, to make the off-board connections more modular and cleaner.
+### Optional parts
 
-## Battery pak parts
+You can also optionally buy JST+PH headers and cables to solder on to the boards (instead of soldering wires directly), to make the off-board connections more modular and cleaner (one set {below} is enough for several controllers). Note: you have quite a bit of flexibility here, e.g. could skip buying the 2-pin PH parts and just use 2-pin JST + 4-pin PH.
 
 Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
-AAA terminals | 1 | [Link](https://www.amazon.com/12Pairs-Battery-Negative-Positive-Conversion/dp/B08Y5HVKLH) | $8.00 | May be able to find a smaller, cheaper pack somewhere
+PH (2.0mm) 2-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.19 | 
+PH (2.0mm) 2-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.57 | 
+JST (1.25mm) 2-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.23 | 
+JST (1.25mm) 2-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.62 | 
+PH (2.0mm) 4-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.71 | 
+PH (2.0mm) 4-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.66 | 
+Shipping | --- | --- | ~$3 | 
+--- | --- | --- | --- | ---
+**Total** | --- | --- | ~$9 | 
+
+
+## Battery "pak" parts
+
+Component | Quantity | Link | Price | Note
+--- | --- | --- | --- | ---
+AAA terminals | 1 | [Link](https://www.aliexpress.com/item/32884289489.html) | ~$2.50 | May be able to find a smaller, cheaper pack - *also make sure your 3d printed controller-terminal block will fit the terminals you order*
 --- | --- | --- | --- | ---
 Lithium polymer battery | 1 | [Link](https://www.aliexpress.com/item/1005003258173852.html) | $6.00 | You can also use a smaller/cheaper battery. Just make sure it fits in the 6mm x 40mm x 50mm battery pak cutout.
 --- | --- | --- | --- | ---
@@ -40,6 +54,6 @@ Battery pak bottom | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$3
 Battery pak controller-terminal | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$2 | Linked "thing" is all three of the required pak parts
 Shipping | --- | --- | ~$7 | You'll probably want to have all three pak parts 3d printed from the same supplier to save on shipping
 --- | --- | --- | --- | ---
-**Total** | --- | --- | ~$30 | 
+**Total** | --- | --- | ~$24.5 | 
 
 
