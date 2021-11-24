@@ -5,7 +5,7 @@ Note: as mentioned elsewhere, you *could* skip having a battery pak and wire a b
 
 ----
 
-If you can print or build your own battery "pak", the total project price should be < $50 for a single controller or < $90 for 4.
+**If you can print or build your own battery "pak", the total project price should be < $50 for a single controller or < $90 for 4.**
 
 Otherwise the total price of building 1 controller is around or slightly above a similar off-the-shelf wireless controller at ~$60, but you could still produce ~4 of them for closer to $30 or $35 per controller (since many items only come in multi-packs, e.g. PCBs, battery terminals; and buying in "bulk" saves on shipping costs).
 
@@ -41,6 +41,8 @@ Shipping | --- | --- | ~$3 |
 
 ## Battery "pak" parts
 
+*Note: if possible, you should print the `*`custom parts yourself, or have a friend with a 3d printer help.*
+
 Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
 AAA terminals | 1 | [Link](https://www.aliexpress.com/item/32884289489.html) | ~$2.50 | May be able to find a smaller, cheaper pack - *also make sure your 3d printed controller-terminal block will fit the terminals you order*
@@ -49,10 +51,10 @@ Lithium polymer battery | 1 | [Link](https://www.aliexpress.com/item/10050032581
 --- | --- | --- | --- | ---
 Lithium polymer battery charging board | 1 | [Link](https://www.aliexpress.com/item/4000522397541.html) | $2.00 | 
 --- | --- | --- | --- | ---
-Battery pak top | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$2 | Linked "thing" is all three of the required pak parts
-Battery pak bottom | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$3 | Linked "thing" is all three of the required pak parts
-Battery pak controller-terminal | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$2 | Linked "thing" is all three of the required pak parts
-Shipping | --- | --- | ~$7 | You'll probably want to have all three pak parts 3d printed from the same supplier to save on shipping
+`*`Battery pak top | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$2 | Linked "thing" is all three of the required pak parts
+`*`Battery pak bottom | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$3 | Linked "thing" is all three of the required pak parts
+`*`Battery pak controller-terminal | 1 | [Link](https://www.thingiverse.com/thing:5028827) | ~$2 | Linked "thing" is all three of the required pak parts
+`*`Shipping | --- | --- | ~$7 | You'll probably want to have all three pak parts 3d printed from the same supplier to save on shipping
 --- | --- | --- | --- | ---
 **Total** | --- | --- | ~$24.5 | 
 
