@@ -6,9 +6,9 @@ See [ordering](https://github.com/sfraint/wireless-n64-controller/blob/main/pcb/
 
 #### Front
 
-<img src=images/pcb_front.jpg width=720>
+<img src=../images/pcb_front.jpg width=720>
 
 #### Back
 
-<img src=images/pcb_back.jpg width=720>
+<img src=../images/pcb_back.jpg width=720>
 
