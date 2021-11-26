@@ -28,9 +28,13 @@
 #define NUM_OF_BUTTONS       13
 // "Soft" buttons are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
 #define NUM_OF_SOFT_BUTTONS  3
+// GPIO 39
 #define ANALOG_X             ADC1_CHANNEL_3
+// GPIO 34
 #define ANALOG_Y             ADC1_CHANNEL_6
-#define ANALOG_BAT           ADC1_CHANNEL_5
+// TODO move Z off this pin
+// GPIO 35
+#define ANALOG_BAT           ADC1_CHANNEL_7
 // TODO add calibration function
 // Amount to add to analog readings (pre scaling)
 #define ANALOG_OFFSET_X        125
@@ -49,10 +53,10 @@
 // Left side pins
 #define BTN_R_PIN          23
 #define BTN_C_DOWN_PIN     22
-#define BTN_C_LEFT_PIN     21
+#define BTN_C_LEFT_PIN     17
 #define BTN_C_UP_PIN       19
 #define BTN_C_RIGHT_PIN    18
-#define BTN_IDK2_PIN       17
+#define BTN_IDK2_PIN       21
 #define BTN_IDK3_PIN       16
 // "Soft" buttons logical button number reference
 // Number reference points to position in the `buttonPins` array in input_poll.cpp
