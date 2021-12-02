@@ -32,7 +32,6 @@
 #define ANALOG_X             ADC1_CHANNEL_3
 // GPIO 34
 #define ANALOG_Y             ADC1_CHANNEL_6
-// TODO move Z off this pin
 // GPIO 35
 #define ANALOG_BAT           ADC1_CHANNEL_7
 // TODO add calibration function
@@ -45,7 +44,7 @@
 // Define which pins are used for each button
 // Right side pins
 #define BTN_START_PIN      36
-#define BTN_Z_PIN          35
+#define BTN_Z_PIN          16
 #define BTN_L_PIN          32
 #define BTN_B_PIN          14
 #define BTN_A_PIN          12
@@ -57,7 +56,7 @@
 #define BTN_C_UP_PIN       19
 #define BTN_C_RIGHT_PIN    18
 #define BTN_IDK2_PIN       21
-#define BTN_IDK3_PIN       16
+#define BTN_IDK3_PIN       35
 // "Soft" buttons logical button number reference
 // Number reference points to position in the `buttonPins` array in input_poll.cpp
 #define BTN_SOFT_SELECT    6

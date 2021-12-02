@@ -50,8 +50,7 @@ void setup_gpio()
   adc1_config_width(ADC_WIDTH_BIT_12);
   adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);
   adc1_config_channel_atten(ANALOG_Y, ADC_ATTEN_DB_11);
-  // TODO enable setup when pin conflict is resolved
-  //adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
+  adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
 
   // Other IO
   gpio_config_t io_conf;
