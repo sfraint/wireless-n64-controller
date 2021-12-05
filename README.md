@@ -3,7 +3,7 @@ This project and its documentation is a Work-In-Progress. I'm still working on w
 
 **The idea is to publish the design files and software I used to upgrade a cheap, wired N64 controller to a wireless, Bluetooth controller**. Hopefully these published files can assist others in completing similar projects.
 
-<img src=images/controller_prototype.jpg width=720>
+<img src=images/controller_prototype.jpg width=1024>
 
 ## Motivation
 When this project was started, no original-form-factor N64 wireless controllers were available for purchase. There were some two-handle controllers, inspired by N64 original controllers, but none with the original three-handle setup.
@@ -11,7 +11,7 @@ When this project was started, no original-form-factor N64 wireless controllers 
 The main goal of this project was to upgrade an existing, cheap three-handle N64 wired controller to use bluetooth, so it could be used with a PC and/or Raspberry Pi.
 
 ## Building your own
-Detailed building instructions **TODO**.
+More detailed building instructions can be found [here](building.md).
 
 *Note: this project requires soldering and some basic understanding of electriconics and circuits. I also assume you already have soldering equipment and some ~30 gauge wire to wire up components.*
 
