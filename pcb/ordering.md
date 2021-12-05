@@ -2,7 +2,7 @@
 
 Since this project uses a custom PCB, you'll need to order it from a PCB manufacturer.
 
-This process is pretty simple, you just need to select a manufacturer, upload the appropriate file, and order it.
+This process is pretty simple, you just need to select a manufacturer, upload the appropriate file, and order it. In this directory I've added a `.kicad_pcb` file as well as a `gerber.zip` file, one of which should be sufficient for most PCB manufacturers.
 
 ### Manufacturers
 

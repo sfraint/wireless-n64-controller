@@ -14,7 +14,7 @@ The pak itself contains a lithium polymer battery, charging circuitry, and batte
 <img src=../images/battery_pak_internals.jpg width=720>
 
 
-The 3d models are also on [thingiverse](https://www.thingiverse.com/thing:5028827).
+I've put both `.step` and `.stl` files in subdirectories here. The 3d models are also on [thingiverse](https://www.thingiverse.com/thing:5028827).
 
 ### Ordering
 
