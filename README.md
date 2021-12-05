@@ -17,7 +17,7 @@ Detailed building instructions **TODO**.
 
 ### Steps
 
-1. Purchase the base parts. See the [BOM for more details and links](https://github.com/sfraint/wireless-n64-controller/blob/main/BOM.md).
+1. Purchase the base parts. See the [BOM for more details and links](BOM.md).
    * Base N64 controller you plan to modify. I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
    * ESP32 microcontroller
    * AAA terminals
