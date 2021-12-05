@@ -26,7 +26,7 @@ Detailed building instructions **TODO**.
 
 2. Print the PCB.
 
-3. Print the battery pak pieces. Alternatively, you could skip using a battery pak and directly wire a battery to the power-in on the PCB or microcontroller.
+3. Print the battery pak pieces. Alternatively, you could skip using a battery pak and directly wire a battery to the power-in on the microcontroller.
 
 4. Program the microcontroller.
 
