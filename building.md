@@ -2,7 +2,7 @@
 
 ## Get the Parts
 
-Some of the parts will take a while to manufacture and ship. For example, if you order the PCB from overseas, you might have to wait ~3 weeks for that. If you order electronic components from overseas, again you might have to wait several weeks for shipping.
+Some of the parts will take a while to manufacture and ship. For example, if you order the PCB from overseas, you might have to wait ~3 weeks for that. If you order electronic components from overseas, again you might have to wait several weeks for shipping, so plan accordingly.
 
 ### 1. Components
 
@@ -29,7 +29,7 @@ See [PCB ordering](pcb/ordering.md) for more details.
 
 ### 3. Print the battery pak pieces
 
-You can print the battery pak pieces yourself and save some money, or you could have a 3d-print shop print them for you. The `.stl` (and `.step`) files for printing are in subdirectories under the `battery_pak/` directory in this repo.
+You can print the battery pak pieces yourself with your (or a friend's) 3d printer and save some money, or you could have a 3d-print shop print them for you. The `.stl` (and `.step`) files for printing are in subdirectories under the `battery_pak/` directory in this repo.
 
 See [battery pak readme](battery_pak/README.md) for more details.
 
