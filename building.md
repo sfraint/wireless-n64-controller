@@ -13,10 +13,10 @@ See the [BOM for more details and some example-component links](BOM.md), but you
 * AAA terminals
 * LiPo battery
 * LiPo battery charging board
+* PH/JST connectors and cables
 
 Optional components:
 
-* PH/JST connectors and cables
 * LED
 * Resistors
 
@@ -54,11 +54,15 @@ Components:
 
 2. **Test**: At this point, I do a quick test to make sure the ESP32 is registering button presses as expected (power it up and either connect to a PC/phone with some gamepad testing application or connect the ESP32 via USB to your PC and monitor it in debug mode).
 
-3. **2-pin connectors**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn`. I solder them such that the connector opening is facing upward, but either direction should work.
+3. **2-pin headers**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn`. I solder them such that the connector opening is facing upward, but either direction should work.
 
-4. **2-pin cables**: Cut 2 of the 2-pin JST cables in half (so each side has a connector), and strip back the insulation a bit to expose the wire. Solder the 2-pin JST cables to the external right trigger, left trigger, and Z boards. You will need to cut or desolder the existing wires running to these boards.
+   <img src=images/2pin_header.jpg width=360>
 
-5. **4-pin connector**: Solder the 4-pin PH header/connector for `Analog`. I solder this so the connector opening is facing downward.
+4. **2-pin cables**: Cut 2 of the 2-pin JST cables in half (so each side has a connector), and strip back the insulation a bit to expose the wire. Solder the 2-pin JST cables to the external right trigger, left trigger, and Z boards (one pair of wires per board). You will need to cut or desolder the existing wires running to these boards.
+
+5. **4-pin header**: Solder the 4-pin PH header/connector for `Analog`. I solder this so the connector opening is facing downward.
+
+   <img src=images/4pin_header.jpg width=240>
 
 6. **4-pin cables**: Cut one of the 4-pin PH cables in half (so each side has a connector), and strip back the insulation a bit to expose the wire. Solder the 4-pin PH cables to the external joystick board. You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
 
@@ -77,7 +81,7 @@ These steps are completely optional. You can do one or all of them if you want.
 
 #### Battery pak
 
-Components:
+Components (ignore the fact that the charge board is a USB-C board, which doesn't fit in the current battery pak):
 
 <img src=images/battery_components.jpg width=720>
 
@@ -85,15 +89,13 @@ Components:
 
 2. **Terminals**: Solder one set of the flat+spring terminals to the charging board output. Solder the flat terminal to the negative board output `OUT-` and solder the spring terminal to the positive board output `OUT+`. **After this point, be very careful not to let the terminals touch eachother. If they touch, it will short the battery and could cause a fire. I would recommend putting black electrical tape over the flat terminal for now.**
 
-3. **Assembly**: Put the charging board in the appropriate cutout in the battery pak, place the battery over that, and place the flat and spring terminals in the appropriate cutouts in the battery pak. The spring terminal should be at the top-left, when the pak-clip cutout is at the top and facing you:
+3. **Assembly**: Put the charging board in the appropriate cutout in the battery pak, place the battery over that, and place the flat and spring terminals in the appropriate cutouts in the battery pak. The spring terminal should be at the top-left, when the pak-clip cutout is at the top and facing you.
 
-   <img src=images/battery_pak_terminal.jpg width=360>
-
-   The final assembly should look something like this:
+   Before putting the battery over the charging board, the final assembly should look something like this:
    
    <img src=images/battery_pak_internals.jpg width=720>
 
-4. Clip the two side of the battery pak together.
+4. Clip the two pieces of the battery pak together.
 
 #### Controller-side terminals
 
@@ -115,11 +117,11 @@ Components:
 
 3. Reinstall the external boards/mounts (triggers, joystick) in the appropriate spots.
 
-4. Install the terminal-block in the back-piece of the controller shell:
+4. Install the terminal-block in the expansion-pak-port of the back-piece of the controller shell:
 
    <img src=images/battery_terminals.jpg width=720>
 
-5. Reinstall the back-piece of the controller shell - make sure to reinstall the left and right trigger buttons when you do this.
+5. Mount the back-piece of the controller shell on the front-piece - make sure to reinstall the left and right trigger buttons when you do this.
 
 
 

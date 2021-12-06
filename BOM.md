@@ -24,7 +24,7 @@ PCB | 1 | [Link**](pcb/ordering.md) | ~$15 (for 5, shipped) | **See link for det
 
 ### Optional parts
 
-You can also optionally buy JST+PH headers and cables to solder on to the boards (instead of soldering wires directly), to make the off-board connections more modular and cleaner (one set {below} is enough for several controllers).
+You can also buy JST+PH headers and cables to solder on to the boards (instead of soldering wires directly), to make the off-board connections more modular and cleaner (one set {below} is enough for several controllers).
 
 I've also listed the `start` button pull-down resistor as optional since I've not had an issues without it. However, if you see the `start` button appear to get "stuck" in the pressed position, or erroneously trigger, you might need this.
 
