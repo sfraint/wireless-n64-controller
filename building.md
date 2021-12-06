@@ -1,19 +1,20 @@
 # Building You Own Wireless Controller
 
-## Get the Base Parts
+## Get the Parts
 
-Some of the parts will take a while to manufacture and ship. For example, if you order the PCB from overseas, you might have to wait 2-3 weeks for that. If you order electronic components from overseas, again you might have to wait several weeks for shipping.
+Some of the parts will take a while to manufacture and ship. For example, if you order the PCB from overseas, you might have to wait ~3 weeks for that. If you order electronic components from overseas, again you might have to wait several weeks for shipping.
 
 ### 1. Components
 
 See the [BOM for more details and some example-component links](BOM.md), but you will need:
 
-* Base N64 controller you plan to modify. I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
+* Base N64 controller you plan to modify.
+   * I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
 * ESP32 microcontroller
 * AAA terminals
 * LiPo battery
 * LiPo battery charging board
-* PH/JST connectors and cables
+* PH/JST connectors and cables (somewhat optional - you can directly solder wires to everything instead, but I prefer removable plugs/connectors)
 
 Optional components:
 
@@ -56,15 +57,19 @@ Components:
 
 3. **2-pin headers**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn`. I solder them such that the connector opening is facing upward, but either direction should work.
 
-   <img src=images/2pin_header.jpg width=360>
+   <img src=images/2pin_header.jpg width=480>
 
-4. **2-pin cables**: Cut 2 of the 2-pin JST cables in half (so each side has a connector), and strip back the insulation a bit to expose the wire. Solder the 2-pin JST cables to the external right trigger, left trigger, and Z boards (one pair of wires per board). You will need to cut or desolder the existing wires running to these boards.
+4. **2-pin cables**: Cut 2 of the 2-pin JST cables in half (so you end up with two halves each with one bare-wire end and one connector end), and strip back the insulation a bit to expose the wire.
+
+   Solder the 2-pin JST halves to the external right trigger, left trigger, and Z boards (one cable-half per board, each board has two pads to solder to, and it doesn't matter which wire is soldered to which pad). You will need to cut or desolder the existing wires running to these boards.
 
 5. **4-pin header**: Solder the 4-pin PH header/connector for `Analog`. I solder this so the connector opening is facing downward.
 
-   <img src=images/4pin_header.jpg width=240>
+   <img src=images/4pin_header.jpg width=360>
 
-6. **4-pin cables**: Cut one of the 4-pin PH cables in half (so each side has a connector), and strip back the insulation a bit to expose the wire. Solder the 4-pin PH cables to the external joystick board. You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
+6. **4-pin cables**: Cut one of the 4-pin PH cables in half (so you end up with two halves each with one bare-wire end and one connector end), and strip back the insulation a bit to expose the wire. Solder the 4-pin PH cables to the external joystick board.
+
+   You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
 
 7. **Test**: At this point, I do another quick test to make sure the ESP32 is registering analog joystick data (same as `#2` above).
 
@@ -87,19 +92,21 @@ Components (ignore the fact that the charge board is a USB-C board, which doesn'
 
 1. **Battery**: Solder the battery to the charging board (battery positive to `B+` and battery negative to `B-`).
 
-2. **Terminals**: Solder one set of the flat+spring terminals to the charging board output. Solder the flat terminal to the negative board output `OUT-` and solder the spring terminal to the positive board output `OUT+`. **After this point, be very careful not to let the terminals touch eachother. If they touch, it will short the battery and could cause a fire. I would recommend putting black electrical tape over the flat terminal for now.**
+2. **Terminals**: **After this step, be very careful not to let the terminals touch each other. If they touch, it will short the battery and could cause a fire. I would recommend putting black electrical tape over the flat terminal for now.**
 
-3. **Assembly**: Put the charging board in the appropriate cutout in the battery pak, place the battery over that, and place the flat and spring terminals in the appropriate cutouts in the battery pak. The spring terminal should be at the top-left, when the pak-clip cutout is at the top and facing you.
+   Solder one set of the flat+spring terminals to the charging board output. Solder the flat terminal to the negative board output `OUT-` and solder the spring terminal to the positive board output `OUT+`.
+
+3. **Assembly**: Put the charging board in the cutout in the battery pak, place the battery over that, and place the flat and spring terminals in the appropriate cutouts in the battery pak. The spring terminal should be at the top-left, when the pak-clip cutout is at the top and facing you.
 
    Before putting the battery over the charging board, the final assembly should look something like this:
    
    <img src=images/battery_pak_internals.jpg width=720>
 
-4. Clip the two pieces of the battery pak together.
+4. (Remove electrical tap covering the flat terminal and) Clip the two pieces of the battery pak together.
 
 #### Controller-side terminals
 
-1. **Terminal wiring**: Cut one of the 2-pin PH cables in half (so each side has a connector), and strip back the insulation a bit to expose the wire. With the connector-end plugged into the ESP32, you should be able to tell which wire corresponds to `+` and which corresponds to `-`. Solder the `+` wire to the second flat terminal and solder the `-` wire to the second spring terminal.
+1. **Terminal wiring**: Cut one of the 2-pin PH cables in half (so you end up with two halves each with one bare-wire end and one connector end), and strip back the insulation a bit to expose the wire. With the connector-end plugged into the ESP32, you should be able to tell which wire corresponds to `+` and which corresponds to `-`. Solder the `+` wire to the second flat terminal and solder the `-` wire to the second spring terminal.
 
 2. **Assembly**: Super glue the terminals to the terminal-block piece so they line up with the opposite terminal shape from the battery pak (i.e. spring terminal should plug into flat terminal, and vice versa):
 
