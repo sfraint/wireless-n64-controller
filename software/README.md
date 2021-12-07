@@ -24,7 +24,7 @@ Then:
 
 1. Build: `idf.py build`
 
-2. Flash: `idf.py -p /dev/ttyACM0 -b 115200 flash` (or `-p /dev/ttyUSB0`)
+2. Flash: `idf.py -p /dev/ttyUSB0 -b 115200 flash` (or `-p /dev/ttyACM0`)
 
-3. Monitor: `idf.py -p /dev/ttyACM0 monitor` (when you're done, press `Ctrl` + `]` to end the monitor session)
+3. (Optionally) Monitor: `idf.py -p /dev/ttyUSB0 monitor` (when you're done, press `Ctrl` + `]` to end the monitor session)
 

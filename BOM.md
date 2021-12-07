@@ -18,25 +18,31 @@ N64 USB controller | 1 | [Link](https://www.amazon.com/Classic-Controller-iNNEXT
 ESP32 Lolin32 Lite | 1 | [Link](https://www.aliexpress.com/item/4000038780903.html) | $2.67 | These are "discontinued" but I've found them readily avaialble and one of the most cost-effective uControllers for this project
 Shipping | --- | --- | ~$1.50 | 
 --- | --- | --- | --- | ---
-PCB | 1 | [Link**](https://github.com/sfraint/wireless-n64-controller/blob/main/pcb/ordering.md) | ~$15 (for 5, shipped) | **See link for details
+PCB | 1 | [Link**](pcb/ordering.md) | ~$15 (for 5, shipped) | **See link for details
 --- | --- | --- | --- | ---
 **Total** | --- | --- | ~$31 | 
 
 ### Optional parts
 
-You can also optionally buy JST+PH headers and cables to solder on to the boards (instead of soldering wires directly), to make the off-board connections more modular and cleaner (one set {below} is enough for several controllers). Note: you have quite a bit of flexibility here, e.g. could skip buying the 2-pin PH parts and just use 2-pin JST + 4-pin PH.
+You can also buy JST+PH headers and cables to solder on to the boards (instead of soldering wires directly), to make the off-board connections more modular and cleaner (one set {below} is enough for several controllers).
+
+I've also listed the `start` button pull-down resistor as optional since I've not had an issues without it. However, if you see the `start` button appear to get "stuck" in the pressed position, or erroneously trigger, you might need this.
+
+Note: I've opted to use smaller headers than the board is technically designed for - this is just so hand soldering is quicker and easier. You have quite a bit of flexibility here, e.g. could try to use just PH-sized parts instead of JST parts.
 
 Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
-PH (2.0mm) 2-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.19 | 
-PH (2.0mm) 2-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.57 | 
-JST (1.25mm) 2-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.23 | 
-JST (1.25mm) 2-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.62 | 
-PH (2.0mm) 4-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.71 | 
-PH (2.0mm) 4-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.66 | 
+PH (2.0mm) 2-pin cables | 1 | [Link](https://www.aliexpress.com/item/4001235017139.html) | $0.81 | Currently, just to connect the battery terminals to the ESP board
+JST (1.25mm) 2-pin cables | 1 | [Link](https://www.aliexpress.com/item/4001235017139.html) | $0.76 | Used to connect external boards for Z, L, and R triggers
+JST (1.25mm) 2-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.62 | Connector for Z, L, and R triggers
+PH (2.0mm) 4-pin cables | 1 | [Link](https://www.aliexpress.com/item/4001235017139.html) | $1.19 | Used to connect external analog joystick board
+PH (2.0mm) 4-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.66 | Connector for joystick analog inputs
 Shipping | --- | --- | ~$3 | 
 --- | --- | --- | --- | ---
-**Total** | --- | --- | ~$9 | 
+3mm through-hole LED (5mm might also fit) | 1 | | | LED indicator for the controller - can signal when controller is on, trying to connect, etc.
+10k Resistors | 2 | | | Current-limiting resistor for the LED as well as pull-down resistor for start button; smaller resistances work too, but I prefer a dimmer indicator light and lower power consumption
+--- | --- | --- | --- | ---
+**Total** | --- | --- | ~$10 | 
 
 
 ## Battery "pak" parts
@@ -45,7 +51,7 @@ Shipping | --- | --- | ~$3 |
 
 Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
-AAA terminals | 1 | [Link](https://www.aliexpress.com/item/32884289489.html) | ~$2.50 | May be able to find a smaller, cheaper pack - *also make sure your 3d printed controller-terminal block will fit the terminals you order*
+AAA terminals | 1 | [Link](https://www.aliexpress.com/item/32884289489.html) | ~$2.50 | May be able to find a smaller, cheaper pack - *also make sure your 3d printed controller-terminal block and battery pak will fit the terminals you order*
 --- | --- | --- | --- | ---
 Lithium polymer battery | 1 | [Link](https://www.aliexpress.com/item/1005003258173852.html) | $6.00 | You can also use a smaller/cheaper battery. Just make sure it fits in the 6mm x 40mm x 50mm battery pak cutout.
 --- | --- | --- | --- | ---
