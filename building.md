@@ -75,14 +75,14 @@ These steps are completely optional. You can do one or all of them if you want.
 
 1. **LED**: Solder the LED and its current-limiting resistor (`R1`) to the PCB. This is only needed if you want visual feedback from the controller (e.g. see when it is powered up).
 
-2. **`Start` button**: Solder the `start` button pull-down resistor (`R2`). This is only needed if have issues with the `start` button getting "stuck" pressed or erronously registering button presses.
+2. **`Start` button**: Solder the `start` button pull-down resistor (`R2`). This is only needed if you have issues with the `start` button getting "stuck" pressed or erronously registering button presses.
 
 
 ### 4. Assemble the battery pak
 
 #### Battery pak
 
-Components (ignore the fact that the charge board is a USB-C board, which doesn't fit in the current battery pak):
+Components (ignore the fact that the charge board pictured below is a USB-C board, which doesn't fit in the current battery pak):
 
 <img src=images/battery_components.jpg width=720>
 
@@ -102,7 +102,7 @@ Components (ignore the fact that the charge board is a USB-C board, which doesn'
 
 #### Controller-side terminals
 
-1. **Terminal wiring**: Cut one of the 2-pin PH cables in half (so you end up with two halves each with one bare-wire end and one connector end), and strip back the insulation a bit to expose the wire. With the connector-end plugged into the ESP32, you should be able to tell which wire corresponds to `+` and which corresponds to `-`. Solder the `+` wire to the second flat terminal and solder the `-` wire to the second spring terminal.
+1. **Terminal wiring**: With one of the PH cables plugged into the ESP32, you should be able to tell which wire corresponds to `+` and which corresponds to `-` based on markings on the ESP32 board. Solder the `+` wire to another flat terminal and solder the `-` wire to another spring terminal.
 
 2. **Assembly**: Super glue the terminals to the terminal-block piece so they line up with the opposite terminal shape from the battery pak (i.e. spring terminal should plug into flat terminal, and vice versa):
 
@@ -114,11 +114,11 @@ Components (ignore the fact that the charge board is a USB-C board, which doesn'
 
 2. Plug in the external JST/PH cables into the appropriate PCB-connector.
 
+3. Reinstall the external boards/mounts (triggers, joystick) in the appropriate spots.
+
    Reassembled front-piece of the controller shell should look something like this:
 
    <img src=images/installed_pcb.jpg width=720>
-
-3. Reinstall the external boards/mounts (triggers, joystick) in the appropriate spots.
 
 4. Install the terminal-block in the expansion-pak-port of the back-piece of the controller shell:
 
