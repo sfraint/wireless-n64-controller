@@ -55,11 +55,11 @@ Components:
 
 2. **Test**: At this point, I do a quick test to make sure the ESP32 is registering button presses as expected (power it up and either connect to a PC/phone with some gamepad testing application or connect the ESP32 via USB to your PC and monitor it in debug mode).
 
-3. **2-pin headers**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn` (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). I solder them such that the connector opening is facing upward, but either direction should work.
+3. **2-pin headers**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn`. I solder them such that the connector opening is facing upward, but either direction should work.
 
    <img src=images/2pin_header.jpg width=480>
 
-4. **2-pin cables**: Solder one 2-pin JST cable to each external board: right trigger, left trigger, and Z board (each board has two pads to solder to, and it doesn't matter which wire is soldered to which pad). You will need to cut or desolder the existing wires running to these boards.
+4. **2-pin cables**: Solder one 2-pin JST cable to each external board: right trigger, left trigger, and Z board (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). Each board has two pads to solder to, and it doesn't matter which wire is soldered to which pad. You will need to cut or desolder the existing wires running to these boards.
 
 5. **4-pin header**: Solder the 4-pin PH header/connector for `Analog`. I solder this so the connector opening is facing downward.
 
@@ -88,7 +88,7 @@ Components (ignore the fact that the charge board pictured below is a USB-C boar
 
 1. **Battery**: Solder the battery to the charging board (battery positive to `B+` and battery negative to `B-`).
 
-2. **Terminals**: **After this step, be very careful not to let the terminals touch each other. If they touch, it will short the battery and could cause a fire. I would recommend putting black electrical tape over the flat terminal for now.**
+2. **Terminals**: **After this step, be very careful not to let the terminals touch each other. If they touch, it will short the battery and could cause a fire. I would recommend putting electrical tape over the flat terminal for now.**
 
    Solder one set of the flat+spring terminals to the charging board output. Solder the flat terminal to the negative board output `OUT-` and solder the spring terminal to the positive board output `OUT+`.
 
