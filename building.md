@@ -55,21 +55,17 @@ Components:
 
 2. **Test**: At this point, I do a quick test to make sure the ESP32 is registering button presses as expected (power it up and either connect to a PC/phone with some gamepad testing application or connect the ESP32 via USB to your PC and monitor it in debug mode).
 
-3. **2-pin headers**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn`. I solder them such that the connector opening is facing upward, but either direction should work.
+3. **2-pin headers**: Solder the 2-pin JST headers/connectors for the `R trig`, `L trig` and `Z btn` (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). I solder them such that the connector opening is facing upward, but either direction should work.
 
    <img src=images/2pin_header.jpg width=480>
 
-4. **2-pin cables**: Cut 2 of the 2-pin JST cables in half (so you end up with two halves each with one bare-wire end and one connector end), and strip back the insulation a bit to expose the wire.
-
-   Solder the 2-pin JST halves to the external right trigger, left trigger, and Z boards (one cable-half per board, each board has two pads to solder to, and it doesn't matter which wire is soldered to which pad). You will need to cut or desolder the existing wires running to these boards.
+4. **2-pin cables**: Solder one 2-pin JST cable to each external board: right trigger, left trigger, and Z board (each board has two pads to solder to, and it doesn't matter which wire is soldered to which pad). You will need to cut or desolder the existing wires running to these boards.
 
 5. **4-pin header**: Solder the 4-pin PH header/connector for `Analog`. I solder this so the connector opening is facing downward.
 
    <img src=images/4pin_header.jpg width=360>
 
-6. **4-pin cables**: Cut one of the 4-pin PH cables in half (so you end up with two halves each with one bare-wire end and one connector end), and strip back the insulation a bit to expose the wire. Solder the 4-pin PH cables to the external joystick board.
-
-   You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
+6. **4-pin cables**: Solder the 4-pin PH cable to the analog joystick board (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
 
 7. **Test**: At this point, I do another quick test to make sure the ESP32 is registering analog joystick data (same as `#2` above).
 

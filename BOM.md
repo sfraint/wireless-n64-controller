@@ -32,10 +32,10 @@ Note: I've opted to use smaller headers than the board is technically designed f
 
 Component | Quantity | Link | Price | Note
 --- | --- | --- | --- | ---
-PH (2.0mm) 2-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.19 | Currently, just to connect the battery terminals to the ESP board
-JST (1.25mm) 2-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.23 | Used to connect external boards for Z, L, and R triggers
+PH (2.0mm) 2-pin cables | 1 | [Link](https://www.aliexpress.com/item/4001235017139.html) | $0.81 | Currently, just to connect the battery terminals to the ESP board
+JST (1.25mm) 2-pin cables | 1 | [Link](https://www.aliexpress.com/item/4001235017139.html) | $0.76 | Used to connect external boards for Z, L, and R triggers
 JST (1.25mm) 2-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.62 | Connector for Z, L, and R triggers
-PH (2.0mm) 4-pin dual-sided cables | 1 | [Link](https://www.aliexpress.com/item/4001353071671.html) | $1.71 | Used to connect external analog joystick board
+PH (2.0mm) 4-pin cables | 1 | [Link](https://www.aliexpress.com/item/4001235017139.html) | $1.19 | Used to connect external analog joystick board
 PH (2.0mm) 4-pin right angle | 1 | [Link](https://www.aliexpress.com/item/1005003115054198.html) | $0.66 | Connector for joystick analog inputs
 Shipping | --- | --- | ~$3 | 
 --- | --- | --- | --- | ---
