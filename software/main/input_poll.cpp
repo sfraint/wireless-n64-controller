@@ -264,17 +264,17 @@ void input_poll_loop(void* args)
       debug("\n");
       
       if (bleGamepad.isConnected()) {
-        printf("Sending report ");
+        debug("Sending report ");
         bleGamepad.sendReport();
-        printf("Sent report\n");
+        debug("Sent report\n");
       } else {
-        printf("No report sent, not connected\n");
+        debug("No report sent, not connected\n");
       }
       gettimeofday(&tv, &tz);
       int timeTakenTotal = tv.tv_usec - start;
       debug("ANALOG TIME:   %d\n", timeTakenAnalog >> 10);
       debug("PREPRINT TIME: %d\n", timeTakenPrePrint >> 10);
-      printf("TOTAL TIME:    %d\n", timeTakenTotal >> 10);
+      debug("TOTAL TIME:    %d\n", timeTakenTotal >> 10);
     }
 
 
@@ -293,7 +293,7 @@ void input_poll_loop(void* args)
         vTaskDelay(xDelay);
         gettimeofday(&tv, &tz);
         int timeTakenEnd = tv.tv_usec - start;
-        if (changed) printf("END TIME:     %d\n", timeTakenEnd >> 10);
+        if (changed) debug("END TIME:     %d\n", timeTakenEnd >> 10);
         continue;
     }
     // Button DOWN
