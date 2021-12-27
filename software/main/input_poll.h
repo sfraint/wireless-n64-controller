@@ -97,7 +97,9 @@ extern uint32_t currentDpadStates[4];
 extern uint32_t dpadPins[4];
 extern uint32_t physicalButtons[NUM_OF_BUTTONS];
 
-
+uint16_t get_analog_raw(adc1_channel_t pin);
+bool poll_buttons();
+bool poll_dpad();
 void input_poll_loop(void* args);
 
 #endif

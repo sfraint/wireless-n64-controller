@@ -62,6 +62,18 @@ int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t 
 }
 
 
+// Reads raw value from analog pin. Uses multi-sampling to reduce noise a bit
+uint16_t get_analog_raw(adc1_channel_t pin) {
+  uint32_t val = 0;
+  // Read several times to reduce noise
+  // Val will be between 0-32768 (0-4096*8)
+  for(int i = 0; i < 8; i++) {
+    val += adc1_get_raw(pin);
+  }
+  return (uint16_t) (val >> 3);
+}
+
+
 // Reads value from analog pin and returns scaled, multi-sampled value ~between -32767 and 32768
 int16_t get_analog(adc1_channel_t pin, uint32_t offset) {
   // TODO redo all this logic, incorporate calibration
@@ -114,6 +126,54 @@ uint8_t get_battery_level() {
 }
 
 
+// Poll for "regular" button presses and returns a boolean indicating if button states changed
+bool poll_buttons() {
+    bool changed = false;
+    // Regular buttons
+    for (uint32_t currentIndex = 0 ; currentIndex < NUM_OF_BUTTONS ; currentIndex++) {
+      currentButtonStates[currentIndex]  = gpio_get_level((gpio_num_t) buttonPins[currentIndex]);
+
+      if (currentButtonStates[currentIndex] != previousButtonStates[currentIndex]) {
+        changed = true;
+        if(currentButtonStates[currentIndex] == 1) {
+          // Button numbers are 1-indexed
+          bleGamepad.press(currentIndex + 1);
+        } else {
+          // Button numbers are 1-indexed
+          bleGamepad.release(currentIndex + 1);
+        }
+      }
+    }
+    return changed;
+}
+
+
+// Poll for dpad button presses and returns a boolean indicating if button states changed
+bool poll_dpad() {
+    bool changed = false;
+    // D-pad
+    // up, down, left, right
+    for (uint32_t i = 0 ; i < 4; i++) {
+      currentDpadStates[i]  = gpio_get_level((gpio_num_t) dpadPins[i]);
+      if (currentDpadStates[i] != previousDpadStates[i]) {
+        changed = true;
+        if(!ENABLE_HAT_DPAD) {
+          if(currentDpadStates[i] == 1) {
+            debug("press DPAD %d (%d)", i, NUM_OF_BUTTONS + i);
+            bleGamepad.press(NUM_OF_BUTTONS + i);
+          } else {
+            bleGamepad.release(NUM_OF_BUTTONS + i);
+          }
+        }
+      }
+    }
+    // Do I need to setup both hats?
+    bleGamepad.setHat(encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
+    bleGamepad.setHat2(encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
+    return changed;
+}
+
+
 // Poll joystick and button inputs
 void input_poll_loop(void* args)
 {
@@ -158,43 +218,11 @@ void input_poll_loop(void* args)
     gettimeofday(&tv, &tz);
     int timeTakenAnalog = tv.tv_usec - start;
 
-
     // D-pad
-    // up, down, left, right
-    for (uint32_t i = 0 ; i < 4; i++) {
-      currentDpadStates[i]  = gpio_get_level((gpio_num_t) dpadPins[i]);
-      if (currentDpadStates[i] != previousDpadStates[i]) {
-        changed = true;
-        if(!ENABLE_HAT_DPAD) {
-          if(currentDpadStates[i] == 1) {
-            debug("press DPAD %d (%d)", i, NUM_OF_BUTTONS + i);
-            bleGamepad.press(NUM_OF_BUTTONS + i);
-          } else {
-            bleGamepad.release(NUM_OF_BUTTONS + i);
-          }
-        }
-      } 
-    }
-    // Do I need to setup both hats?
-    bleGamepad.setHat(encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
-    bleGamepad.setHat2(encode_hat(currentDpadStates[0], currentDpadStates[1], currentDpadStates[2], currentDpadStates[3]));
-
+    changed |= poll_dpad();
 
     // Regular buttons
-    for (uint32_t currentIndex = 0 ; currentIndex < NUM_OF_BUTTONS ; currentIndex++) {
-      currentButtonStates[currentIndex]  = gpio_get_level((gpio_num_t) buttonPins[currentIndex]);
-
-      if (currentButtonStates[currentIndex] != previousButtonStates[currentIndex]) {
-        changed = true;
-        if(currentButtonStates[currentIndex] == 1) {
-          // Button numbers are 1-indexed
-          bleGamepad.press(currentIndex + 1);
-        } else {
-          // Button numbers are 1-indexed
-          bleGamepad.release(currentIndex + 1);
-        }
-      }
-    }
+    changed |= poll_buttons();
     
     // "Soft" buttons
     // TODO improve `changed` logic to detect soft-button resetting other buttons
