@@ -14,7 +14,11 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
+// LED mode and misc related status indicators
 uint32_t led_mode = 0;
+bool bt_connected = false;
+bool startup_routine_running = true;
+
 BleGamepad bleGamepad;
 xQueueHandle gpio_evt_queue = NULL; // Button-press event queue
 
@@ -81,25 +85,50 @@ void setup_bt() {
   bleGamepad.setAutoReport(false);
 }
 
+
+static void led_toggle_helper(uint32_t val) {
+  gpio_set_level((gpio_num_t) LED_IO_PIN, val);
+}
+
+
 // Control LED output
 static void led_handler(void* arg)
 {
     const TickType_t xDelay = 50 / portTICK_PERIOD_MS;  // 50ms
     uint32_t count = 0;
     for(;;) {
-        if (led_mode == LED_OFF) {
-            gpio_set_level((gpio_num_t) LED_IO_PIN, 0);
-        } else if (led_mode == LED_ON) {
-            gpio_set_level((gpio_num_t) LED_IO_PIN, 1);
-        } else if (led_mode == LED_BLINK_SLOW) {
-            gpio_set_level((gpio_num_t) LED_IO_PIN, (count % 16) == 1);
-        } else if (led_mode == LED_BLINK_MED) {
-            gpio_set_level((gpio_num_t) LED_IO_PIN, (count % 8) == 1);
-        } else if (led_mode == LED_BLINK_FAST) {
-            gpio_set_level((gpio_num_t) LED_IO_PIN, (count % 4) == 1);
-        } else if (led_mode == LED_BLINK_VERY_FAST) {
-            gpio_set_level((gpio_num_t) LED_IO_PIN, (count % 2) == 1);
+        const uint32_t on = 1;
+        const uint32_t off = 0;
+        uint32_t very_slow = (count % 32) == 1;
+        uint32_t slow = (count % 16) == 1;
+        uint32_t medium = (count % 8) == 1;
+        uint32_t fast = (count % 4) == 1;
+        uint32_t very_fast = (count % 2) == 1;
+        bt_connected = bleGamepad.isConnected();
+        if (startup_routine_running) {
+            // Starting up
+            led_toggle_helper(on);
+        } else if (!bt_connected) {
+            // Waiting for BT connection
+            led_toggle_helper(medium);
+        } else {
+            // Connected, running like normal
+            led_toggle_helper(very_slow);
         }
+        // TODO re-incorporate or remove `led_mode`
+        /*} else if (led_mode == LED_OFF) {
+            led_toggle_helper(off);
+        } else if (led_mode == LED_ON) {
+            led_toggle_helper(on);
+        } else if (led_mode == LED_BLINK_SLOW) {
+            led_toggle_helper(slow);
+        } else if (led_mode == LED_BLINK_MED) {
+            led_toggle_helper(medium);
+        } else if (led_mode == LED_BLINK_FAST) {
+            led_toggle_helper(fast);
+        } else if (led_mode == LED_BLINK_VERY_FAST) {
+            led_toggle_helper(very_fast);
+        }*/
         vTaskDelay(xDelay);
         count += 1;
         if (count > 31) count = 0;
@@ -163,11 +192,13 @@ extern "C" {
 
 void app_main(void)
 {
+    startup_routine_running = true;
+    led_mode = LED_ON;
     setup_gpio();
     setup_tasks();
     setup_bt();
-    led_mode = LED_ON;
     printf("Initial setup complete!\n");
+    startup_routine_running = false;
 
     /* Print chip information */
     esp_chip_info_t chip_info;
