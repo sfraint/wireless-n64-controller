@@ -75,19 +75,19 @@ void setup_gpio()
 }
 
 void setup_bt() {
-  uint32_t count = NUM_OF_BUTTONS + NUM_OF_SOFT_BUTTONS;
-  uint32_t hat_count = 0;
-  if (ENABLE_HAT_DPAD) {
-    hat_count = 2;
-  }
-  printf("Setting up BT controller w/ %d buttons (hat dpad %d, hat count %d)", count, ENABLE_HAT_DPAD, hat_count);
-  bleGamepad.begin(count, hat_count, true, true, false, false, false, false, false, false, false, false, false, false, false);
-  bleGamepad.setAutoReport(false);
+    uint32_t count = NUM_OF_BUTTONS + NUM_OF_SOFT_BUTTONS;
+    uint32_t hat_count = 0;
+    if (ENABLE_HAT_DPAD) {
+      hat_count = 2;
+    }
+    printf("Setting up BT controller w/ %d buttons (hat dpad %d, hat count %d)", count, ENABLE_HAT_DPAD, hat_count);
+    bleGamepad.begin(count, hat_count, true, true, false, false, false, false, false, false, false, false, false, false, false);
+    bleGamepad.setAutoReport(false);
 }
 
 
 static void led_toggle_helper(uint32_t val) {
-  gpio_set_level((gpio_num_t) LED_IO_PIN, val);
+    gpio_set_level((gpio_num_t) LED_IO_PIN, val);
 }
 
 
@@ -178,10 +178,10 @@ static void gpio_button_handler(void* arg)
 
 void setup_tasks()
 {
-  gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
-  xTaskCreate(gpio_button_handler, "gpio_button_handler", 2048, NULL, 10, NULL);
-  xTaskCreate(led_handler, "led_handler", 2048, NULL, 10, NULL);
-  xTaskCreate(input_poll_loop, "in_poll", 4096, NULL, 10, NULL);
+    gpio_evt_queue = xQueueCreate(10, sizeof(uint32_t));
+    xTaskCreate(gpio_button_handler, "gpio_button_handler", 2048, NULL, 10, NULL);
+    xTaskCreate(led_handler, "led_handler", 2048, NULL, 10, NULL);
+    xTaskCreate(input_poll_loop, "in_poll", 4096, NULL, 10, NULL);
 }
 
 
