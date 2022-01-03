@@ -14,7 +14,15 @@ This setup needs to be done once per project:
 1. Set correct target, e.g. `idf.py set-target esp32`
 
 2. Configure project `idf.py menuconfig`
-    * In here, make sure to enable Bluetooth, NimbleCpp, set compiler optimizations to O2, set FreeRTOS tick frequency to 1000 Hz, etc.
+
+   In here, make sure to set the following settings:
+   * Component config
+     * Bluetooth
+       * Bluetooth - `*` (enabled, required for NimBLE)
+     * Bluetooth Host - `NimBLE - BLE only`
+   * FreeRTOS
+     * Tick rate (Hz) - `1000` (required to allow <10 ms sleep, for fast polling)
+
 
 #### Building and Running
 
