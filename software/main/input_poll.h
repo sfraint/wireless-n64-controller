@@ -76,6 +76,20 @@
 #define BUTTON_LONG_PRESS_THRESH       121
 #define BUTTON_VERY_LONG_PRESS_THRESH  301
 
+
+// Approx. min, centered, and max ADC readings for joystick potentiometers
+#define ANALOG_MIN        0
+#define ANALOG_MAX        3900
+#define ANALOG_CENTER     (ANALOG_MAX/2)
+// Multiplier to apply to scaled analog readings
+// Should be higher than 1 so the max value can be hit consistently
+#define ANALOG_OVERSCALE  3/2
+// Values used by BleGamepad joystick
+#define JOYSTICK_MIN      -32767
+#define JOYSTICK_MAX      32767
+// 1600 is ~5% of 32767, before analog overscaling
+#define JOYSTICK_DEADZONE 1200
+
 // Looks like 5 is always pulled high?
 // (right) 39, 34 are used for analog in
 // (left) 1, 3 are used for UART0; 5 is stuck high     15, 2, 4 are used for other IO in this app
@@ -96,6 +110,16 @@ extern uint32_t previousDpadStates[4];
 extern uint32_t currentDpadStates[4];
 extern uint32_t dpadPins[4];
 extern uint32_t physicalButtons[NUM_OF_BUTTONS];
+
+
+// Analog input center and range
+extern uint16_t center_x;
+extern uint16_t min_x;
+extern uint16_t max_x;
+extern uint16_t center_y;
+extern uint16_t min_y;
+extern uint16_t max_y;
+
 
 uint16_t get_analog_raw(adc1_channel_t pin);
 bool poll_buttons();

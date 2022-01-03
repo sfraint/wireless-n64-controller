@@ -56,47 +56,50 @@ uint32_t currentDpadStates[4];
 uint32_t dpadPins[4] = {25, 27, 26, 33};
 
 
+// Analog input center and range
+uint16_t center_x = ANALOG_CENTER;
+uint16_t min_x = ANALOG_MIN;
+uint16_t max_x = ANALOG_MAX;
+uint16_t center_y = ANALOG_CENTER;
+uint16_t min_y = ANALOG_MIN;
+uint16_t max_y = ANALOG_MAX;
+
+
 // Scale x from `in` range to `out` range
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
 
-// Reads raw value from analog pin. Uses multi-sampling to reduce noise a bit
+// Return raw value from analog pin. Uses multi-sampling to reduce noise a bit
 uint16_t get_analog_raw(adc1_channel_t pin) {
     uint32_t val = 0;
     // Read several times to reduce noise
     // Val will be between 0-32768 (0-4096*8)
     for(int i = 0; i < 8; i++) {
-      val += adc1_get_raw(pin);
+        val += adc1_get_raw(pin);
     }
     return (uint16_t) (val >> 3);
 }
 
 
-// Reads value from analog pin and returns scaled, multi-sampled value ~between -32767 and 32768
-int16_t get_analog(adc1_channel_t pin, uint32_t offset) {
-    // TODO redo all this logic, incorporate calibration
+// Convert the provided raw analog value to a joystick value (-32767 to 32767) based on minimum, median, and maximum values.
+int16_t analog_to_joystick_value(uint16_t raw, uint16_t min, uint16_t med, uint16_t max) {
+    // Shortcut for min/max values
+    if (raw >= max) return JOYSTICK_MAX;
+    if (raw <= min) return JOYSTICK_MIN;
 
-    uint32_t val = 0;
-    // Read several times to reduce noise
-    // Val will be between 0-32768 (0-4096*8)
-    for(int i = 0; i < 8; i++) {
-      val += adc1_get_raw(pin) + offset;
+    // Negative
+    if (raw < med) {
+        int32_t joystick_val = map(raw, min, med, JOYSTICK_MIN, 0) * ANALOG_OVERSCALE;
+        if (joystick_val < JOYSTICK_MIN) return JOYSTICK_MIN;
+        return (int16_t) joystick_val;
     }
-  
-    // Convert to signed value
-    // TODO fix overflow issue w/ map to remove left-shift hack
-    if (val <= 16384) {
-      // Using -7000 and 5000 here based on my potentiometer output
-      // Arbitrary values should go away after calibration is implemented
-      int32_t val_scaled = (map(val, 0, 16384, -7000, 0) << 3);
-      if (val_scaled < -32767) return -32767;
-      return val_scaled;
-    }
-    int32_t val_scaled = (map(val, 16385, 32768, 0, 5000) << 3);
-    if (val_scaled > 32767) return 32767;
-    return (int16_t) val_scaled;
+
+    // Positive
+    int32_t joystick_val = map(raw, med, max, 0, JOYSTICK_MAX) * ANALOG_OVERSCALE;
+    if (joystick_val > JOYSTICK_MAX) return JOYSTICK_MAX;
+    return (int16_t) joystick_val;
 }
 
 
@@ -116,11 +119,11 @@ signed char encode_hat(uint32_t up, uint32_t down, uint32_t left, uint32_t right
 uint8_t get_battery_level() {
     uint16_t rawBatt = adc1_get_raw(ANALOG_BAT);
     if (rawBatt > BATTERY_LEVEL_FULL) {
-      currentBattState = 100;
+        currentBattState = 100;
     } else if (rawBatt < BATTERY_LEVEL_EMPTY) {
-      currentBattState = 0;
+        currentBattState = 0;
     } else {
-      currentBattState = map(rawBatt, BATTERY_LEVEL_EMPTY, BATTERY_LEVEL_FULL, 0, 100);
+        currentBattState = map(rawBatt, BATTERY_LEVEL_EMPTY, BATTERY_LEVEL_FULL, 0, 100);
     }
     return (uint8_t) currentBattState;
 }
@@ -174,6 +177,38 @@ bool poll_dpad() {
 }
 
 
+// Poll for joystick changes and returns a boolean indicating if the states changed
+bool poll_joystick() {
+    bool changed = false;
+
+    // X
+    currentXState = analog_to_joystick_value(get_analog_raw(ANALOG_X), min_x, center_x, max_x);
+    if ((currentXState > 0 && currentXState < JOYSTICK_DEADZONE) || (currentXState < 0 && currentXState > (-1 * JOYSTICK_DEADZONE))) {
+        currentXState = 0;
+    }
+    if (currentXState != previousXState) {
+        debug(" ADC1_X: %d\n", currentXState);
+        previousXState = currentXState;
+        bleGamepad.setX(currentXState);
+        changed = true;
+    }
+
+    // Y
+    currentYState = analog_to_joystick_value(get_analog_raw(ANALOG_Y), min_y, center_y, max_y);
+    if ((currentYState > 0 && currentYState < JOYSTICK_DEADZONE) || (currentYState < 0 && currentYState > (-1 * JOYSTICK_DEADZONE))) {
+        currentYState = 0;
+    }
+    if (currentYState != previousYState) {
+        debug(" ADC1_Y: %d\n", currentYState);
+        previousYState = currentYState;
+        bleGamepad.setY(currentYState);
+        changed = true;
+    }
+
+    return changed;
+}
+
+
 // Poll joystick and button inputs
 void input_poll_loop(void* args)
 {
@@ -194,27 +229,16 @@ void input_poll_loop(void* args)
         counter += 1;
         uint32_t mgmt_level = gpio_get_level((gpio_num_t) MGMT_IO_PIN);
         bool changed = false;
-    
+        
         // Battery
         if (ENABLE_BATTERY_CHECK) {
             bleGamepad.setBatteryLevel(get_battery_level());
         }
 
         // Joystick
-        currentXState = get_analog(ANALOG_X, ANALOG_OFFSET_X);
-        if ((currentXState - ANALOG_DRIFT > previousXState) || (currentXState + ANALOG_DRIFT < previousXState)) {
-            debug(" ADC1_X: %d\n", currentXState);
-            previousXState = currentXState;
-            bleGamepad.setX(currentXState);
-            changed = true;
-        }
-        currentYState = get_analog(ANALOG_Y, ANALOG_OFFSET_Y);
-        if ((currentYState - ANALOG_DRIFT > previousYState) || (currentYState + ANALOG_DRIFT < previousYState)) {
-            debug(" ADC1_Y: %d\n", currentYState);
-            previousYState = currentYState;
-            bleGamepad.setY(currentYState);
-            changed = true;
-        }
+        bool joystick_changed = poll_joystick();
+        changed |= joystick_changed;
+        if (joystick_changed) debug("X: %d    Y: %d\n", currentXState, currentYState);
         gettimeofday(&tv, &tz);
         int timeTakenAnalog = tv.tv_usec - start;
 
@@ -223,12 +247,12 @@ void input_poll_loop(void* args)
 
         // Regular buttons
         changed |= poll_buttons();
-    
+        
         // "Soft" buttons
         // TODO improve `changed` logic to detect soft-button resetting other buttons
         // Assume if all Dpad buttons are pressed, that we're in soft-button mode
         if (currentDpadStates[0] == 1 && currentDpadStates[1] == 1 && currentDpadStates[2] == 1 && currentDpadStates[3] == 1) {
-    
+        
             // Reset dpad
             // Do I need to set both hats?
             bleGamepad.setHat(encode_hat(0,0,0,0));
@@ -244,7 +268,7 @@ void input_poll_loop(void* args)
                     debug(" soft button %d pressed\n", i);
                     currentSoftButtonStates[i] = 1;
                     bleGamepad.press(NUM_OF_BUTTONS + i + 1);
-
+                    
                     // Don't allow both the phsycal and soft-button to be pressed
                     currentButtonStates[ref] = 0;
                     bleGamepad.release(ref + 1);
@@ -290,7 +314,7 @@ void input_poll_loop(void* args)
                 debug("%d", currentSoftButtonStates[i]);
             }
             debug("\n");
-      
+            
             if (bleGamepad.isConnected()) {
                 debug("Sending report ");
                 bleGamepad.sendReport();
