@@ -22,11 +22,11 @@ PCB | 1 | [Link**](pcb/ordering.md) | ~$15 (for 5, shipped) | **See link for det
 --- | --- | --- | --- | ---
 **Total** | --- | --- | ~$31 | 
 
-### Optional parts
+### Recommended parts
 
 You can also buy JST+PH headers and cables to solder on to the boards (instead of soldering wires directly), to make the off-board connections more modular and cleaner (one set {below} is enough for several controllers).
 
-I've also listed the `start` button pull-down resistor as optional since I've not had an issues without it. However, if you see the `start` button appear to get "stuck" in the pressed position, or erroneously trigger, you might need this.
+I've also listed the `start` button pull-down resistor as recommended since I've had mixed results without it. You may need this to prevent the `start` button from getting "stuck" in the pressed position, or erroneously trigger.
 
 Note: I've opted to use smaller headers than the board is technically designed for - this is just so hand soldering is quicker and easier. You have quite a bit of flexibility here, e.g. could try to use just PH-sized parts instead of JST parts.
 
@@ -40,7 +40,7 @@ PH (2.0mm) 4-pin right angle | 1 | [Link](https://www.aliexpress.com/item/100500
 Shipping | --- | --- | ~$3 | 
 --- | --- | --- | --- | ---
 3mm through-hole LED (5mm might also fit) | 1 | | | LED indicator for the controller - can signal when controller is on, trying to connect, etc.
-10k Resistors | 2 | | | Current-limiting resistor for the LED as well as pull-down resistor for start button; smaller resistances work too, but I prefer a dimmer indicator light and lower power consumption
+10k or 20k Resistors | 2 | | | Current-limiting resistor for the LED as well as pull-down resistor for start button; smaller resistances work too, but I prefer a dimmer indicator light and lower power consumption
 --- | --- | --- | --- | ---
 **Total** | --- | --- | ~$10 | 
 
