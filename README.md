@@ -10,6 +10,30 @@ When this project was started, no original-form-factor N64 wireless controllers 
 
 The main goal of this project was to upgrade an existing, cheap three-handle N64 wired controller to use bluetooth, so it could be used with a PC and/or Raspberry Pi.
 
+## Operation
+
+Using the controller is pretty straightforward:
+
+1. Insert a charged battery pak into the controller to turn it on. Note: if the LED is installed, it should light up once the controller is powered on.
+
+2. After a few seconds, pair the controller to a client machine (e.g. phone or PC). The controller should show up as `ESP32 BLE Gamepad` in bluetooth device managers. Note: if the LED is installed, it will start blinking when the controller automatically enters pairing mode after power-up.
+
+3. If the LED is installed, it will blink slowly when the controller is paired with a client machine.
+
+### Analog Calibration
+
+If you press and hold the `Start` button before the controller enters pairing mode, it will enter analog calibration mode, indicated by a rapidly blinking LED.
+
+Upon entering calibration mode, the initial position of the joystick is recorded as the new `center` position. During calibration mode, you should rotate the joystick around in circles, reaching the all the extremes (far up, right, down, left) to reset `min` and `max` values for both the X and Y axes.
+
+Calibration mode lasts for a few seconds (~5 sec). Upon completion, it writes results to non-volatile storage if possible, then resumes normal startup routing - entering pairing mode.
+
+### "Soft" Buttons
+
+This wireless N64 controller has all the normal N64 buttons plus a few extra software buttons, triggered by special button combinations. These software buttons can be associated with special functions in some emulators, like triggering the menu function, save/load state, etc.
+
+There are currently three "soft" buttons, all triggered by pressing the center of the d-pad (i.e. pressing all 4 directions at the same time) plus either `Start`, `A`, or `B`.
+
 ## Building your own
 More detailed building instructions can be found [here](building.md).
 
