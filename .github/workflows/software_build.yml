@@ -18,11 +18,11 @@ jobs:
           cd software/components
           wget https://github.com/h2zero/esp-nimble-cpp/archive/refs/tags/1.3.1.zip
           unzip *.zip
-      - uses: actions/checkout@v3
-        with:
-          repository: espressif/esp-idf
-          path: idf-repo
-          submodules: 'recursive'
+      # - uses: actions/checkout@v3
+      #   with:
+      #     repository: espressif/esp-idf
+      #     path: idf-repo
+      #     submodules: 'recursive'
       - name: Build
         uses: espressif/esp-idf-ci-action@v1
         with:
