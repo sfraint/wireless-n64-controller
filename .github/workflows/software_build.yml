@@ -2,9 +2,10 @@ name: Software Build
 on:
   push:
     branches:
-       - gha*
+      - gha*
     paths:
-       - 'software/**'
+      - 'software/**'
+      - '.github/workflows/**'
 
 jobs:
   get_date:
