@@ -56,21 +56,21 @@ jobs:
           . $HOME/esp/esp-idf/export.sh
           cd software
           idf.py build
-    build_win:
-      runs-on: windows-latest
-      steps:
-        - name: Setup IDF
-          shell: powershell
-          run: |
-            Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile esp-idf-tools-setup.exe
-            esp-idf-tools-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
-            $InstallerProcess = Get-Process esp-idf-tools-setup
-            Wait-Process -Id $InstallerProcess.id
-        # TODO setup components
-        - uses: actions/checkout@v2
-        - name: Build
-          shell: cmd
-          run: |
-            %userprofile%\Desktop\esp-idf\export.bat
-            cd software
-            idf.py build
+  build_win:
+    runs-on: windows-latest
+    steps:
+      - name: Setup IDF
+        shell: powershell
+        run: |
+          Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile esp-idf-tools-setup.exe
+          esp-idf-tools-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
+          $InstallerProcess = Get-Process esp-idf-tools-setup
+          Wait-Process -Id $InstallerProcess.id
+      # TODO setup components
+      - uses: actions/checkout@v2
+      - name: Build
+        shell: cmd
+        run: |
+          %userprofile%\Desktop\esp-idf\export.bat
+          cd software
+          idf.py build
