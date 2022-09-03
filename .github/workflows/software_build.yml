@@ -8,11 +8,6 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  get_date:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Testing
-        run: echo TEST
   build_mac:
     runs-on: macos-latest
     steps:
@@ -25,7 +20,7 @@ jobs:
           cd ~/esp
           git clone -b v4.4.2 --recursive https://github.com/espressif/esp-idf.git
           cd ~/esp/esp-idf
-          ./install.sh esp32
+          ./install.sh esp32 > install_logs
       - uses: actions/checkout@v2
       - name: Setup NimBLE
         run: |
@@ -36,4 +31,30 @@ jobs:
       - name: Build
         run: |
           . $HOME/esp/esp-idf/export.sh
+          cd software
+          idf.py build
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prereqs
+        run: |
+          sudo apt-get install git wget flex bison gperf python3 python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
+      - name: Setup IDF
+        run: |
+          mkdir -p ~/esp
+          cd ~/esp
+          git clone -b v4.4.2 --recursive https://github.com/espressif/esp-idf.git
+          cd ~/esp/esp-idf
+          ./install.sh esp32 > install_logs
+      - uses: actions/checkout@v2
+      - name: Setup NimBLE
+        run: |
+          mkdir software/components
+          cd software/components
+          wget https://github.com/h2zero/esp-nimble-cpp/archive/refs/tags/1.3.1.zip
+          unzip *.zip
+      - name: Build
+        run: |
+          . $HOME/esp/esp-idf/export.sh
+          cd software
           idf.py build
