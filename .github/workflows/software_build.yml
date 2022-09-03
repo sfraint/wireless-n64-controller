@@ -62,7 +62,8 @@ jobs:
       - name: Setup IDF
         shell: powershell
         run: |
-          $Path="esp-idf-tools-setup.exe"
+          $Cwd = Get-Location
+          $Path="$Cwd\esp-idf-tools-setup.exe"
           Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile $Path
           esp-idf-tools-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
           $InstallerProcess = Get-Process esp-idf-tools-setup
