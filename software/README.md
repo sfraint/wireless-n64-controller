@@ -7,7 +7,7 @@ Note: This uses a slightly modified version of [`ESP32-BLE-Gamepad`](https://git
 
 ### Setup
 
-This project requires `ESP-IDF` (works with version 4.4) and `NimBLE-cpp` (currently requires an older version, 1.3)
+This project requires `ESP-IDF` (works with version 4.4) and `NimBLE-cpp` (currently requires an older version, 1.3).
 
 1. Follow the standard [ESP-IDF setup instructions](https://github.com/espressif/esp-idf)
 
@@ -34,7 +34,7 @@ Then, from the `software` directory in this project:
 
 3. (Optionally) Monitor: `idf.py -p /dev/ttyUSB0 monitor` (when you're done, press `Ctrl` + `]` to end the monitor session)
 
-#### Re-Configuration
+#### (Optional) Re-Configuration
 You shouldn't need to complete idf configuration if you're using an ESP32, as these settings are recorded in the provided `sdkconfig`. If you do need to manually configure the project, then complete the following from the `software` directory in the project:
 
 1. Set correct target, e.g. `idf.py set-target esp32`
