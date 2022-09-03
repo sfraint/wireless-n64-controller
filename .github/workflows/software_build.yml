@@ -8,7 +8,27 @@ on:
       - '.github/workflows/**'
 
 jobs:
-  build_mac:
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup NimBLE
+        run: |
+          mkdir software/components
+          cd software/components
+          wget https://github.com/h2zero/esp-nimble-cpp/archive/refs/tags/1.3.1.zip
+          unzip *.zip
+      - uses: actions/checkout@v3
+        with:
+          repository: espressif/esp-idf
+          path: idf-repo
+          submodules: 'recursive'
+      - name: Build
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v4.4
+          path: 'software'
+  setup_and_build_mac:
     runs-on: macos-latest
     if: false
     steps:
@@ -32,7 +52,7 @@ jobs:
           . $HOME/esp/esp-idf/export.sh
           cd software
           idf.py build
-  build_linux:
+  setup_and_build_linux:
     runs-on: ubuntu-latest
     if: false
     steps:
@@ -56,23 +76,24 @@ jobs:
           . $HOME/esp/esp-idf/export.sh
           cd software
           idf.py build
-  build_win:
-    runs-on: windows-latest
-    steps:
-      - name: Setup IDF
-        shell: powershell
-        run: |
-          $Cwd = Get-Location
-          $Path="$Cwd\esp-idf-tools-setup.exe"
-          Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile $Path
-          & "$Path" /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
-          $InstallerProcess = Get-Process esp-idf-tools-setup
-          Wait-Process -Id $InstallerProcess.id
-      # TODO setup components
-      - uses: actions/checkout@v2
-      - name: Build
-        shell: cmd
-        run: |
-          %userprofile%\Desktop\esp-idf\export.bat
-          cd software
-          idf.py build
+  # # This job never completed - TODO figure out what went wrong
+  # build_win:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Setup IDF
+  #       shell: powershell
+  #       run: |
+  #         $Cwd = Get-Location
+  #         $Path="$Cwd\esp-idf-tools-setup.exe"
+  #         Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile $Path
+  #         & "$Path" /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
+  #         $InstallerProcess = Get-Process esp-idf-tools-setup
+  #         Wait-Process -Id $InstallerProcess.id
+  #     # TODO setup components
+  #     - uses: actions/checkout@v2
+  #     - name: Build
+  #       shell: cmd
+  #       run: |
+  #         %userprofile%\Desktop\esp-idf\export.bat
+  #         cd software
+  #         idf.py build
