@@ -10,12 +10,11 @@ on:
 jobs:
   build_mac:
     runs-on: macos-latest
+    if: false
     steps:
-      - name: Prereqs
-        run: |
-          brew install cmake ninja dfu-util
       - name: Setup IDF
         run: |
+          brew install cmake ninja dfu-util
           mkdir -p ~/esp
           cd ~/esp
           git clone -b v4.4.2 --recursive https://github.com/espressif/esp-idf.git
@@ -35,12 +34,11 @@ jobs:
           idf.py build
   build_linux:
     runs-on: ubuntu-latest
+    if: false
     steps:
-      - name: Prereqs
-        run: |
-          sudo apt-get install git wget flex bison gperf python3 python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
       - name: Setup IDF
         run: |
+          sudo apt-get install git wget flex bison gperf python3 python3-venv cmake ninja-build ccache libffi-dev libssl-dev dfu-util libusb-1.0-0
           mkdir -p ~/esp
           cd ~/esp
           git clone -b v4.4.2 --recursive https://github.com/espressif/esp-idf.git
@@ -58,3 +56,21 @@ jobs:
           . $HOME/esp/esp-idf/export.sh
           cd software
           idf.py build
+    build_win:
+      runs-on: windows-latest
+      steps:
+        - name: Setup IDF
+          shell: powershell
+          run: |
+            Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile esp-idf-tools-setup.exe
+            esp-idf-tools-setup.exe /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
+            $InstallerProcess = Get-Process esp-idf-tools-setup
+            Wait-Process -Id $InstallerProcess.id
+        # TODO setup components
+        - uses: actions/checkout@v2
+        - name: Build
+          shell: cmd
+          run: |
+            %userprofile%\Desktop\esp-idf\export.bat
+            cd software
+            idf.py build
