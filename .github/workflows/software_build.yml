@@ -65,8 +65,7 @@ jobs:
           $Cwd = Get-Location
           $Path="$Cwd\esp-idf-tools-setup.exe"
           Invoke-WebRequest -URI https://dl.espressif.com/dl/idf-installer/esp-idf-tools-setup-online-2.16.exe -OutFile $Path
-          $Cmd = '$Path /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL'
-          Invoke-Expression $Cmd
+          & "$Path" /VERYSILENT /SUPPRESSMSGBOXES /SP- /NOCANCEL
           $InstallerProcess = Get-Process esp-idf-tools-setup
           Wait-Process -Id $InstallerProcess.id
       # TODO setup components
