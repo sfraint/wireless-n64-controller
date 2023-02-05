@@ -216,6 +216,7 @@ private:
   bool _includeAccelerator;
   bool _includeBrake;
   bool _includeSteering;
+  TaskHandle_t _serverTaskHandle = NULL;
   
   BleConnectionStatus* connectionStatus;
 

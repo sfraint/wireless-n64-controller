@@ -9,7 +9,7 @@
 
 // LED state
 extern uint32_t led_mode;
-#define LED_IO_PIN             4
+#define LED_IO_PIN             5
 // LED command events
 #define LED_OFF                0
 #define LED_ON                 1
@@ -29,6 +29,5 @@ extern uint32_t led_mode;
 extern BleGamepad bleGamepad;
 
 extern xQueueHandle gpio_evt_queue; // Button-press event queue
-
 #endif
 

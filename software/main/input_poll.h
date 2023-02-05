@@ -67,7 +67,7 @@
 // Right side pins
 #define BTN_START_PIN      36
 #define BTN_Z_PIN          16
-#define BTN_L_PIN          32
+#define BTN_L_PIN          4
 #define BTN_B_PIN          14
 #define BTN_A_PIN          12
 // Left side pins
@@ -84,7 +84,9 @@
 #define BTN_SOFT_ALT2      1
 
 // Button state for management button
-#define MGMT_IO_PIN            2
+// TODO change this back to 2?
+#define MGMT_IO_PIN            4
+#define ANALOG_PWR_PIN         21
 // Events
 #define NONE                   0
 #define BUTTON_PRESS           1
@@ -92,9 +94,9 @@
 #define BUTTON_VERY_LONG_PRESS 3
 #define BUTTON_UNPRESS         10
 // Timings TODO base on constant delay time
-#define BUTTON_PRESS_THRESH            2
-#define BUTTON_LONG_PRESS_THRESH       121
-#define BUTTON_VERY_LONG_PRESS_THRESH  301
+#define BUTTON_PRESS_THRESH            8
+#define BUTTON_LONG_PRESS_THRESH       484
+#define BUTTON_VERY_LONG_PRESS_THRESH  1204
 
 
 // Approx. min, centered, and max ADC readings for joystick potentiometers

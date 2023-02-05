@@ -52,7 +52,7 @@ int16_t currentBattState = 100;
 // Up, down, left, right
 uint32_t previousDpadStates[4];
 uint32_t currentDpadStates[4];
-uint32_t dpadPins[4] = {25, 27, 26, 33};
+uint32_t dpadPins[4] = {25, 27, 26, 13};
 
 
 // Analog input center and range
@@ -252,6 +252,10 @@ void input_poll_loop(void* args)
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     settimeofday(&tv, &tz);
+    printf("Battery:      %d\n", get_battery_level());
+    uint16_t bat_raw = adc1_get_raw(ANALOG_BAT);
+    printf("Raw battery:  %d\n", bat_raw);
+    printf("Battery volt: %.2f\n", (float)(bat_raw) * (float)(2.0 * 3.1 / 4095.0));
     while (true) {
         gettimeofday(&tv, &tz);
         int start = tv.tv_usec;

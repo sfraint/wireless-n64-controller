@@ -10,10 +10,16 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/queue.h"
+#include "esp_bt.h"
+#include "esp_wifi.h"
+#include "esp_sleep.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 #include "driver/adc.h"
 #include "driver/gpio.h"
+
+#include "esp_err.h"
+#include "esp_pm.h"
 
 // LED mode and misc related status indicators
 uint32_t led_mode = 0;
@@ -54,6 +60,7 @@ static void IRAM_ATTR gpioy_isr_handler(void* arg)
                         county++;
                     } 
 }
+TaskHandle_t poll_task_handle = NULL;
 
 // Setup specified pin number as pulled-down, input pin
 void setup_input_pin(uint32_t pin) {
@@ -85,6 +92,9 @@ void setup_gpio()
 
     // Battery Monitor, Pin also used with 6 pin Joystick, therefore only availble with 4 pin joysticks
     if(!SIXPIN_ENABLED){
+    // Analog in
+    //adc_power_on();
+    //adc_power_acquire();
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
     }   
@@ -136,9 +146,17 @@ void setup_gpio()
     io_conf.intr_type = GPIO_INTR_DISABLE;
     io_conf.mode = GPIO_MODE_INPUT;
     io_conf.pin_bit_mask = ((1ULL << MGMT_IO_PIN));
+    io_conf.pull_down_en = (gpio_pulldown_t) 1;
+    io_conf.pull_up_en = (gpio_pullup_t) 0;
+    gpio_config(&io_conf);
+    // Analog "power"
+    io_conf.intr_type = GPIO_INTR_DISABLE;
+    io_conf.mode = GPIO_MODE_OUTPUT;
+    io_conf.pin_bit_mask = ((1ULL << ANALOG_PWR_PIN));
     io_conf.pull_down_en = (gpio_pulldown_t) 0;
     io_conf.pull_up_en = (gpio_pullup_t) 0;
     gpio_config(&io_conf);
+    gpio_set_level((gpio_num_t)ANALOG_PWR_PIN, 1);
 }
 
 void setup_bt() {
@@ -208,7 +226,7 @@ static void led_handler(void* arg)
 // Handle button press events
 static void gpio_button_handler(void* arg)
 {
-    const TickType_t xDelay = 500 / portTICK_PERIOD_MS;  // 500ms
+    const TickType_t xDelay = 1500 / portTICK_PERIOD_MS;  // 1500ms
     uint32_t button_press_event;
     uint32_t last_event = NONE;
     //gpio_set_level((gpio_num_t) GPIO_OUTPUT_IO_1, 1);
@@ -224,11 +242,35 @@ static void gpio_button_handler(void* arg)
                 // https://randomnerdtutorials.com/esp32-external-wake-up-deep-sleep/
                 // https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html
                 // https://github.com/espressif/esp-idf/blob/master/examples/system/deep_sleep/main/deep_sleep_example_main.c
-                if (last_event == BUTTON_VERY_LONG_PRESS) {
-                    // This is where you could do a shutdown procedure, e.g.
-                    //esp_sleep_enable_ext0_wakeup(GPIO_NUM_2, 1); //1 = High, 0 = Low
-                    //esp_deep_sleep_start();
-                }
+                //if (last_event == BUTTON_VERY_LONG_PRESS) {
+                    printf("    Going to sleep...\n");\
+
+                    // Stop powering joystick otherwise it consumes almost 1 mA
+                    gpio_set_level((gpio_num_t)ANALOG_PWR_PIN, 0);
+
+                    // Shutdown long running tasks / objects
+	            vTaskDelete(poll_task_handle);
+	            bleGamepad.end();
+	            vTaskDelay(xDelay);
+
+                    // Turn off high-power / radio stuff
+	            //btStop();
+	            esp_wifi_stop();
+	            esp_bt_controller_disable();
+	            esp_bt_controller_deinit();
+
+                    // This didn't work...but only sometimes... It looks like it would occasionally leave the ADC on
+                    //esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1); //1 = High, 0 = Low
+
+                    // Setup wakeup and actually sleep
+                    esp_sleep_enable_ext1_wakeup((1ULL << GPIO_NUM_4), ESP_EXT1_WAKEUP_ANY_HIGH);
+                    // Keep RTC IO pulled down
+                    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+	            //adc_power_release();
+	            //adc_power_off();
+	            //adc_power_acquire();
+                    esp_deep_sleep_start();
+                //}
                 continue;
             }
 
@@ -254,7 +296,7 @@ void setup_tasks()
 
 void setup_poll_task()
 {
-    xTaskCreate(input_poll_loop, "in_poll", 4096, NULL, 10, NULL);
+    xTaskCreate(input_poll_loop, "in_poll", 4096, NULL, 10, &poll_task_handle);
 }
 
 
@@ -302,12 +344,40 @@ void calibrate(bool write_to_storage) {
     }
 }
 
+void print_wakeup_reason(){
+  esp_sleep_wakeup_cause_t wakeup_reason;
+
+  wakeup_reason = esp_sleep_get_wakeup_cause();
+
+  switch(wakeup_reason){
+    case ESP_SLEEP_WAKEUP_EXT0 : printf("Wakeup caused by external signal using RTC_IO\n"); break;
+    case ESP_SLEEP_WAKEUP_EXT1 : printf("Wakeup caused by external signal using RTC_CNTL\n"); break;
+    case ESP_SLEEP_WAKEUP_TIMER : printf("Wakeup caused by timer\n"); break;
+    case ESP_SLEEP_WAKEUP_TOUCHPAD : printf("Wakeup caused by touchpad\n"); break;
+    case ESP_SLEEP_WAKEUP_ULP : printf("Wakeup caused by ULP program\n"); break;
+    default : printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
+  }
+}
+
+extern "C" {
+	int rom_phy_get_vdd33();
+}
+
 
 void app_main(void)
 {
     startup_routine_running = true;
     current_state = STATE_STARTUP;
     led_mode = LED_ON;
+    print_wakeup_reason();
+    
+    /*esp_pm_config_esp32_t pm_config = {
+        .max_freq_mhz = 240, // e.g. 80, 160, 240
+        .min_freq_mhz = 240, // e.g. 40
+        .light_sleep_enable = false, // enable light sleep
+    };
+    ESP_ERROR_CHECK( esp_pm_configure(&pm_config) );*/
+
     bool storage_ok = init_storage();
     setup_gpio();
     setup_tasks();
@@ -340,6 +410,8 @@ void app_main(void)
     }
 
     printf("Initial setup complete!\n");
+    int vdd = rom_phy_get_vdd33();
+    printf("VDD measurement: %d\n", vdd);
     
     startup_routine_running = false;
     current_state = STATE_RUNNING;
