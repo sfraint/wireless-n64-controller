@@ -68,6 +68,7 @@ uint16_t center_y = ANALOG_CENTER;
 uint16_t min_y = ANALOG_MIN;
 uint16_t max_y = ANALOG_MAX;
 
+// X Interrupt Hook 
 static void IRAM_ATTR gpiox_isr_handler(void* arg)
 {
     uint32_t gpio_num = (uint32_t) arg;
@@ -80,7 +81,7 @@ static void IRAM_ATTR gpiox_isr_handler(void* arg)
                 
     xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
 }
-
+// Y Interrupt Hook
 static void IRAM_ATTR gpioy_isr_handler(void* arg)
 {
        uint32_t gpio_num = (uint32_t) arg;
@@ -93,8 +94,8 @@ static void IRAM_ATTR gpioy_isr_handler(void* arg)
                 
     xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
 }
-
-static void gpio_task_example(void* arg)
+// Task to remove Interrupt messages from queues
+static void gpio_task_sixpin(void* arg)
 {
     uint32_t io_num;
     while(true) {
@@ -274,12 +275,12 @@ void input_poll_loop(void* args)
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     settimeofday(&tv, &tz);
-    //SIXPIN Joystick setup
+    //SIXPIN Joystick Interrupts and Tasks setup
     if(SIXPIN_ENABLED){
         //create a queue to handle gpio event from isr
         gpio_sixpin_queue = xQueueCreate(10, sizeof(uint32_t));
         //start gpio task
-        xTaskCreate(gpio_task_example, "gpio_task_example", 2048, NULL, 10, NULL);
+        xTaskCreate(gpio_task_sixpin, "gpio_task_sixpin", 2048, NULL, 10, NULL);
         //install gpio isr service
         gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
         //hook isr handler for specific gpio pin

@@ -35,8 +35,10 @@
 // GPIO 34
 #define ANALOG_Y             ADC1_CHANNEL_6
 
-// 6 PIN Analog Stick config
+// 6-Pin OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
+//Enable SIXPIN Stick - If set to 0 then four pin analog enabled
 #define SIXPIN_ENABLED  1
+
 #define ESP_INTR_FLAG_DEFAULT 0
 // GPIO 39
 #define SIXPIN_ANALOG_X            39
@@ -46,7 +48,6 @@
 #define SIXPIN_ANALOG_Y             34
 // GPIO 34
 #define SIXPIN_ANALOG_YQ             13
-// 6-Pin OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<SIXPIN_ANALOG_X) | (1ULL<<SIXPIN_ANALOG_XQ) | (1ULL<<SIXPIN_ANALOG_Y) | (1ULL<<SIXPIN_ANALOG_YQ))
 // Factor to multiply raw 6-pin output to achieve a joystick value (-32767 to 32767). Should be adjusted for stick wear.
 #define factor  800
