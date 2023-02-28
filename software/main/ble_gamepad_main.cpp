@@ -23,6 +23,7 @@ bool bt_connected = false;
 #define STATE_STARTUP      0
 #define STATE_CALIBRATION  1
 #define STATE_RUNNING      2
+
 uint32_t current_state = STATE_STARTUP;
 bool startup_routine_running = true;
 
@@ -59,10 +60,28 @@ void setup_gpio()
     }
     // Analog in
     adc1_config_width(ADC_WIDTH_BIT_12);
-    adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);
-    adc1_config_channel_atten(ANALOG_Y, ADC_ATTEN_DB_11);
     adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
 
+    // Joystick setup
+    if(SIXPIN_ENABLED){
+        //zero-initialize the config structure.
+        gpio_config_t io_conf = {};
+        //disable pull-down mode
+        io_conf.pull_down_en = (gpio_pulldown_t) 0;
+        //interrupt of rising edge
+        io_conf.intr_type = GPIO_INTR_ANYEDGE;
+        //bit mask of the pins, use GPIO4/5 here
+        io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;
+        //set as input mode
+        io_conf.mode = GPIO_MODE_INPUT;
+        //enable pull-up mode
+        io_conf.pull_up_en = (gpio_pullup_t) 0;
+        gpio_config(&io_conf);
+    }
+    else{
+    adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);
+    adc1_config_channel_atten(ANALOG_Y, ADC_ATTEN_DB_11);
+    }
     // Other IO
     gpio_config_t io_conf;
     // Button feedback LED output

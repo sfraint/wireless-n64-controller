@@ -24,23 +24,41 @@
 #define BATTERY_LEVEL_FULL   2355
 
 // Button state for gamepad buttons
-#define NUM_OF_BUTTONS_RIGHT 6
-#define NUM_OF_BUTTONS       13
+#define NUM_OF_BUTTONS_RIGHT 5
+#define NUM_OF_BUTTONS       11
 // "Soft" buttons are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
 #define NUM_OF_SOFT_BUTTONS  3
+
+// 4 PIN Analog Stick config
 // GPIO 39
 #define ANALOG_X             ADC1_CHANNEL_3
 // GPIO 34
 #define ANALOG_Y             ADC1_CHANNEL_6
+
+// 6 PIN Analog Stick config
+#define SIXPIN_ENABLED  1
+#define ESP_INTR_FLAG_DEFAULT 0
+// GPIO 39
+#define SIXPIN_ANALOG_X            39
 // GPIO 35
-#define ANALOG_BAT           ADC1_CHANNEL_7
+#define SIXPIN_ANALOG_XQ             35
+// GPIO 34
+#define SIXPIN_ANALOG_Y             34
+// GPIO 34
+#define SIXPIN_ANALOG_YQ             13
+// 6-Pin OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
+#define GPIO_INPUT_PIN_SEL  ((1ULL<<SIXPIN_ANALOG_X) | (1ULL<<SIXPIN_ANALOG_XQ) | (1ULL<<SIXPIN_ANALOG_Y) | (1ULL<<SIXPIN_ANALOG_YQ))
+// Factor to multiply raw 6-pin output to achieve a joystick value (-32767 to 32767). Should be adjusted for stick wear.
+#define factor  800
+
 // TODO add calibration function
 // Amount to add to analog readings (pre scaling)
 #define ANALOG_OFFSET_X        125
 #define ANALOG_OFFSET_Y        165
 // Amount of analog change to allow before calling the value changed (post scaling)
 #define ANALOG_DRIFT         200
-
+// GPIO 35
+#define ANALOG_BAT           ADC1_CHANNEL_7
 // Define which pins are used for each button
 // Right side pins
 #define BTN_START_PIN      36
@@ -48,7 +66,6 @@
 #define BTN_L_PIN          32
 #define BTN_B_PIN          14
 #define BTN_A_PIN          12
-#define BTN_IDK1_PIN       13
 // Left side pins
 #define BTN_R_PIN          23
 #define BTN_C_DOWN_PIN     22
@@ -56,7 +73,6 @@
 #define BTN_C_UP_PIN       19
 #define BTN_C_RIGHT_PIN    18
 #define BTN_IDK2_PIN       21
-#define BTN_IDK3_PIN       35
 // "Soft" buttons logical button number reference
 // Number reference points to position in the `buttonPins` array in input_poll.cpp
 #define BTN_SOFT_SELECT    6

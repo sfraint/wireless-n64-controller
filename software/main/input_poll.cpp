@@ -14,6 +14,12 @@
 //#define DEBUG 1
 #include "debug.h"
 
+// When an edge change is detected used to count movement
+int countx = 0;
+int county = 0;
+
+// Setup Queue for interrupts to use
+static xQueueHandle gpio_sixpin_queue = NULL;
 
 // To change pins, update #define's in input_poll.h
 uint32_t buttonPins[NUM_OF_BUTTONS] = {
@@ -27,9 +33,7 @@ uint32_t buttonPins[NUM_OF_BUTTONS] = {
     BTN_Z_PIN,
     BTN_L_PIN,
     BTN_R_PIN,
-    BTN_IDK1_PIN,
-    BTN_IDK2_PIN,
-    BTN_IDK3_PIN
+    BTN_IDK2_PIN
 };
 
 // "Soft" buttons
@@ -64,6 +68,43 @@ uint16_t center_y = ANALOG_CENTER;
 uint16_t min_y = ANALOG_MIN;
 uint16_t max_y = ANALOG_MAX;
 
+static void IRAM_ATTR gpiox_isr_handler(void* arg)
+{
+    uint32_t gpio_num = (uint32_t) arg;
+    if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_X) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_XQ)){ 
+                        countx=countx+factor;
+                    }
+                    else{
+                        countx=countx-factor;
+                    }    
+                
+    xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
+}
+
+static void IRAM_ATTR gpioy_isr_handler(void* arg)
+{
+       uint32_t gpio_num = (uint32_t) arg;
+    if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_Y) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_YQ)){ 
+                        county=county+factor;
+                    }
+                    else{
+                        county=county-factor;
+                    }    
+                
+    xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
+}
+
+static void gpio_task_example(void* arg)
+{
+    uint32_t io_num;
+    while(true) {
+        if(xQueueReceive(gpio_sixpin_queue, &io_num, portMAX_DELAY)) {
+            //printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
+             printf("countx val: %d & countx val: %d\n", countx, county);           
+        }
+    }
+     
+}
 
 // Scale x from `in` range to `out` range
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
@@ -182,7 +223,12 @@ bool poll_joystick() {
     bool changed = false;
 
     // X
+    if(SIXPIN_ENABLED){
+    currentXState = countx;
+    }
+    else{
     currentXState = analog_to_joystick_value(get_analog_raw(ANALOG_X), min_x, center_x, max_x);
+    }
     if ((currentXState > 0 && currentXState < JOYSTICK_DEADZONE) || (currentXState < 0 && currentXState > (-1 * JOYSTICK_DEADZONE))) {
         currentXState = 0;
     }
@@ -194,7 +240,12 @@ bool poll_joystick() {
     }
 
     // Y
+    if(SIXPIN_ENABLED){
+    currentYState = county;
+    }
+    else{
     currentYState = analog_to_joystick_value(get_analog_raw(ANALOG_Y), min_y, center_y, max_y);
+    }
     if ((currentYState > 0 && currentYState < JOYSTICK_DEADZONE) || (currentYState < 0 && currentYState > (-1 * JOYSTICK_DEADZONE))) {
         currentYState = 0;
     }
@@ -223,6 +274,19 @@ void input_poll_loop(void* args)
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     settimeofday(&tv, &tz);
+    //SIXPIN Joystick setup
+    if(SIXPIN_ENABLED){
+        //create a queue to handle gpio event from isr
+        gpio_sixpin_queue = xQueueCreate(10, sizeof(uint32_t));
+        //start gpio task
+        xTaskCreate(gpio_task_example, "gpio_task_example", 2048, NULL, 10, NULL);
+        //install gpio isr service
+        gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+        //hook isr handler for specific gpio pin
+        gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_X, gpiox_isr_handler, (void*) SIXPIN_ANALOG_X);
+        //hook isr handler for specific gpio pin
+        gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_Y, gpioy_isr_handler, (void*) SIXPIN_ANALOG_Y);
+    }
     while (true) {
         gettimeofday(&tv, &tz);
         int start = tv.tv_usec;
