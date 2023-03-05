@@ -237,6 +237,13 @@ bool poll_joystick() {
     return changed;
 }
 
+void print_battery_state() {
+    printf("Battery:      %d\n", get_battery_level());
+    uint16_t bat_raw = adc1_get_raw(ANALOG_BAT);
+    printf("Raw battery:  %d\n", bat_raw);
+    printf("Battery volt: %.2f\n", (float)(bat_raw) * (float)(2.0 * 3.1 / 4095.0));
+}
+
 
 // Poll joystick and button inputs
 void input_poll_loop(void* args)
@@ -252,10 +259,10 @@ void input_poll_loop(void* args)
     tv.tv_sec = 0;
     tv.tv_usec = 0;
     settimeofday(&tv, &tz);
-    printf("Battery:      %d\n", get_battery_level());
-    uint16_t bat_raw = adc1_get_raw(ANALOG_BAT);
-    printf("Raw battery:  %d\n", bat_raw);
-    printf("Battery volt: %.2f\n", (float)(bat_raw) * (float)(2.0 * 3.1 / 4095.0));
+    print_battery_state();
+    gettimeofday(&tv, &tz);
+    int lastActivity = tv.tv_sec;
+    int tmpAct = 0;
     while (true) {
         gettimeofday(&tv, &tz);
         int start = tv.tv_usec;
@@ -263,15 +270,23 @@ void input_poll_loop(void* args)
         uint32_t mgmt_level = gpio_get_level((gpio_num_t) MGMT_IO_PIN);
         bool changed = false;
         
-        // Battery
         if (!SIXPIN_ENABLED){
             if (ENABLE_BATTERY_CHECK) {
                 bleGamepad.setBatteryLevel(get_battery_level());
             }
         }
+        // Battery
+        if (ENABLE_BATTERY_CHECK) {
+            uint8_t bat_level = get_battery_level();
+            if (bat_level == 0) {
+                printf("Low battery, shutting down...");
+                print_battery_state();
+                start_deep_sleep();
+            }
+            bleGamepad.setBatteryLevel(bat_level);
+	}
         // Joystick
         bool joystick_changed = poll_joystick();
-        changed |= joystick_changed;
         if (joystick_changed) debug("X: %d    Y: %d\n", currentXState, currentYState);
         gettimeofday(&tv, &tz);
         int timeTakenAnalog = tv.tv_usec - start;
@@ -312,6 +327,31 @@ void input_poll_loop(void* args)
                 }
                 if (currentSoftButtonStates[i] != previousSoftButtonStates[i]) changed = true;
             }
+        } else if (currentButtonStates[2] == 1 && currentButtonStates[3] == 1 && currentButtonStates[4] == 1 && currentButtonStates[5] == 1) {
+            // Reset C buttons
+            for (uint32_t i = 0; i < 4; i++) {
+                // First C button is at idx 2
+                uint32_t idx = 2 + i;
+                currentButtonStates[idx] = 0;
+                bleGamepad.release(idx + 1);
+            }
+            // Check for soft buttons
+            for (uint32_t i = 0; i < NUM_OF_SOFT_BUTTONS; i++) {
+                uint32_t ref = softButtonRefs[i];
+                if (currentButtonStates[ref] == 1) {
+                    debug(" soft button %d pressed\n", i);
+                    currentSoftButtonStates[i] = 1;
+                    bleGamepad.press(NUM_OF_BUTTONS + i + 1);
+                    
+                    // Don't allow both the phsycal and soft-button to be pressed
+                    currentButtonStates[ref] = 0;
+                    bleGamepad.release(ref + 1);
+                } else {
+                    currentSoftButtonStates[i] = 0;
+                    bleGamepad.release(NUM_OF_BUTTONS + i + 1);
+                }
+                if (currentSoftButtonStates[i] != previousSoftButtonStates[i]) changed = true;
+            }
         } else {
             for (uint32_t i = 0; i < NUM_OF_SOFT_BUTTONS; i++) {
                 currentSoftButtonStates[i] = 0;
@@ -320,10 +360,22 @@ void input_poll_loop(void* args)
             }
         }
 
+        if (changed) {
+            lastActivity = tv.tv_sec;
+        }
 
         gettimeofday(&tv, &tz);
         int timeTakenPrePrint = tv.tv_usec - start;
-        if (changed) {
+        int timeSinceLastActivity = tv.tv_sec - lastActivity;
+        if (timeSinceLastActivity >= IDLE_TIMEOUT_S) {
+            printf("IDLE Timeout, shutting down...\n");
+            start_deep_sleep();
+        } else if (timeSinceLastActivity != tmpAct) {
+            tmpAct = timeSinceLastActivity;
+            printf("LastAct: %d\n", timeSinceLastActivity);
+        }
+        if (changed || joystick_changed) {
+            gettimeofday(&tv, &tz);
             //printf("Button states changed:\n");
             debug("        123456        789AB\n");
             debug(" Group1 ");
@@ -388,6 +440,7 @@ void input_poll_loop(void* args)
         pressed = true;
         if (held == BUTTON_VERY_LONG_PRESS_THRESH) {
             button_press_event = BUTTON_VERY_LONG_PRESS;
+            current_state = STATE_SHUTDOWN;
             xQueueSend(gpio_evt_queue, &button_press_event, NULL);
             led_mode = LED_BLINK_SLOW;
             debug("Button very long pressed!\n");

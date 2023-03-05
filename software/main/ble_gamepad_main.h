@@ -28,6 +28,17 @@ extern uint32_t led_mode;
 
 extern BleGamepad bleGamepad;
 
+
+// Controller state-machine
+#define STATE_STARTUP      0
+#define STATE_CALIBRATION  1
+#define STATE_RUNNING      2
+#define STATE_SHUTDOWN     3
+extern uint32_t current_state;
+
 extern xQueueHandle gpio_evt_queue; // Button-press event queue
+
+void start_deep_sleep();
+
 #endif
 

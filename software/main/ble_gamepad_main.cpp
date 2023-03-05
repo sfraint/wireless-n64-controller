@@ -195,6 +195,8 @@ static void led_handler(void* arg)
             led_toggle_helper(on);
         } else if (current_state == STATE_CALIBRATION) {
             led_toggle_helper(very_fast);
+        } else if (current_state == STATE_SHUTDOWN) {
+            led_toggle_helper(on);
         } else if (!bt_connected) {
             // Waiting for BT connection
             led_toggle_helper(medium);
@@ -222,6 +224,46 @@ static void led_handler(void* arg)
     }
 }
 
+void start_deep_sleep() {
+    current_state = STATE_SHUTDOWN;
+    const TickType_t xDelay100 = 100 / portTICK_PERIOD_MS;  // 100ms
+    printf("    Going to sleep...\n");
+    vTaskDelay(xDelay100);
+
+    // Stop powering joystick otherwise it consumes almost 1 mA
+    gpio_set_level((gpio_num_t)ANALOG_PWR_PIN, 0);
+    printf("    Turned off analog\n");
+    vTaskDelay(xDelay100);
+
+    // Shutdown long running tasks / objects
+    //vTaskDelete(poll_task_handle);
+    //bleGamepad.end();
+    //printf("    Shutdown task and controller obj\n");
+    //vTaskDelay(xDelay100);
+
+    // Turn off high-power / radio stuff
+    //btStop();
+    esp_wifi_stop();
+    esp_bt_controller_disable();
+    esp_bt_controller_deinit();
+    printf("    Shutdown wifi and BT\n");
+    vTaskDelay(xDelay100);
+
+    // This didn't work...but only sometimes... It looks like it would occasionally leave the ADC on
+    //esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1); //1 = High, 0 = Low
+
+    // Setup wakeup and actually sleep
+    esp_sleep_enable_ext1_wakeup((1ULL << GPIO_NUM_4), ESP_EXT1_WAKEUP_ANY_HIGH);
+    // Keep RTC IO pulled down
+    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
+    printf("    Configured sleep\n");
+    vTaskDelay(xDelay100);
+    //adc_power_release();
+    //adc_power_off();
+    //adc_power_acquire();
+    esp_deep_sleep_start();
+}
+
 
 // Handle button press events
 static void gpio_button_handler(void* arg)
@@ -242,35 +284,9 @@ static void gpio_button_handler(void* arg)
                 // https://randomnerdtutorials.com/esp32-external-wake-up-deep-sleep/
                 // https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/sleep_modes.html
                 // https://github.com/espressif/esp-idf/blob/master/examples/system/deep_sleep/main/deep_sleep_example_main.c
-                //if (last_event == BUTTON_VERY_LONG_PRESS) {
-                    printf("    Going to sleep...\n");\
-
-                    // Stop powering joystick otherwise it consumes almost 1 mA
-                    gpio_set_level((gpio_num_t)ANALOG_PWR_PIN, 0);
-
-                    // Shutdown long running tasks / objects
-	            vTaskDelete(poll_task_handle);
-	            bleGamepad.end();
-	            vTaskDelay(xDelay);
-
-                    // Turn off high-power / radio stuff
-	            //btStop();
-	            esp_wifi_stop();
-	            esp_bt_controller_disable();
-	            esp_bt_controller_deinit();
-
-                    // This didn't work...but only sometimes... It looks like it would occasionally leave the ADC on
-                    //esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1); //1 = High, 0 = Low
-
-                    // Setup wakeup and actually sleep
-                    esp_sleep_enable_ext1_wakeup((1ULL << GPIO_NUM_4), ESP_EXT1_WAKEUP_ANY_HIGH);
-                    // Keep RTC IO pulled down
-                    esp_sleep_pd_config(ESP_PD_DOMAIN_RTC_PERIPH, ESP_PD_OPTION_ON);
-	            //adc_power_release();
-	            //adc_power_off();
-	            //adc_power_acquire();
-                    esp_deep_sleep_start();
-                //}
+                if (last_event == BUTTON_VERY_LONG_PRESS) {
+                    start_deep_sleep();
+                }
                 continue;
             }
 
@@ -410,8 +426,8 @@ void app_main(void)
     }
 
     printf("Initial setup complete!\n");
-    int vdd = rom_phy_get_vdd33();
-    printf("VDD measurement: %d\n", vdd);
+    //int vdd = rom_phy_get_vdd33();
+    //printf("VDD measurement: %d\n", vdd);
     
     startup_routine_running = false;
     current_state = STATE_RUNNING;

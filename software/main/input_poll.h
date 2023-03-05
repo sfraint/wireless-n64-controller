@@ -18,10 +18,10 @@
 
 // Whether or not to measure and update battery level
 #define ENABLE_BATTERY_CHECK 0
-// Empirically measured with test ESP32 setup, assuming full battery is 4.2V and empty is 3.6V
+// Assuming full battery is 3.95V and empty is 3.3V
 // Also, assuming battery voltage is cut in half before passing into ESP32
-#define BATTERY_LEVEL_EMPTY  2020
-#define BATTERY_LEVEL_FULL   2355
+#define BATTERY_LEVEL_EMPTY  2150
+#define BATTERY_LEVEL_FULL   2600
 
 // Button state for gamepad buttons
 #define NUM_OF_BUTTONS_RIGHT 5
@@ -98,6 +98,8 @@
 #define BUTTON_LONG_PRESS_THRESH       484
 #define BUTTON_VERY_LONG_PRESS_THRESH  1204
 
+// Seconds of idle time until the controller powers down
+#define IDLE_TIMEOUT_S        180
 
 // Approx. min, centered, and max ADC readings for joystick potentiometers
 #define ANALOG_MIN        0
@@ -132,7 +134,6 @@ extern uint32_t previousDpadStates[4];
 extern uint32_t currentDpadStates[4];
 extern uint32_t dpadPins[4];
 extern uint32_t physicalButtons[NUM_OF_BUTTONS];
-
 
 // Analog input center, range and count for 6-pin joysticks:
 extern int16_t center_x;
