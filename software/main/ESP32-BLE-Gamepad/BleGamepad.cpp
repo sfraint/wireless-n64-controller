@@ -415,13 +415,11 @@ void BleGamepad::begin(uint16_t buttonCount, uint8_t hatSwitchCount, bool includ
 	// END_COLLECTION (Application)
     tempHidReportDescriptor[hidReportDescriptorSize++] = 0xc0;
 	
-  xTaskCreate(this->taskServer, "server", 20000, (void *)this, 5, &this->_serverTaskHandle);
+  xTaskCreate(this->taskServer, "server", 20000, (void *)this, 5, NULL);
 }
 
 void BleGamepad::end(void)
 {
-	vTaskDelete(this->_serverTaskHandle);
-	NimBLEDevice::deinit();
 }
 
 void BleGamepad::setAxes(int16_t x, int16_t y, int16_t z, int16_t rZ, int16_t rX, int16_t rY, int16_t slider1, int16_t slider2, signed char hat1, signed char hat2, signed char hat3, signed char hat4)
