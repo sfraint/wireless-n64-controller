@@ -16,6 +16,7 @@
 #include "driver/gpio.h"
 
 
+
 // LED mode and misc related status indicators
 uint32_t led_mode = 0;
 bool bt_connected = false;
@@ -256,6 +257,50 @@ void calibrate(bool write_to_storage) {
     }
 }
 
+double absolute_value(int value) {
+    if (value < 0) {
+        return -value;
+    } else {
+        return 0;
+    }
+}
+// Calibrate SIXPIN X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~5 seconds to determine range.
+void calibrate_sixpin(bool write_to_storage) {
+    const TickType_t xDelay = 10 / portTICK_PERIOD_MS;  // 10ms
+
+    // Read extreme values for ~5 seconds
+    for (int i = 0; i < 500; i++) {
+        uint16_t x = get_sixpin_count(0);
+        if (x < min_x) min_x = x;
+        if (x > max_x) max_x = x;
+
+        uint16_t y = get_sixpin_count(1);
+        if (y < min_y) min_y = y;
+        if (y > max_y) max_y = y;
+
+        vTaskDelay(xDelay);
+    }
+
+    int factor = absolute_value(min_y);
+
+    min_y = min_y + factor;
+    max_y = max_y + factor;
+    center_y = max_y / 2;
+
+    min_x = min_x + factor;
+    max_x = max_x + factor;
+    center_x = max_x / 2;
+
+    printf("Calibration results:\n");
+    printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
+    printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);
+    if (write_to_storage) {
+        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x);
+        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y);
+        printf("Calibration data written to storage\n");
+    }
+}
+
 
 void app_main(void)
 {
@@ -276,7 +321,12 @@ void app_main(void)
     if (currentButtonStates[6]) {
         current_state = STATE_CALIBRATION;
         printf("Starting calibration\n");
-        calibrate(storage_ok);
+        if(SIXPIN_ENABLED){
+            calibrate_sixpin(storage_ok);
+        }
+        else{
+            calibrate(storage_ok);
+        }
     } else {
         printf("Skipping calibration\n");
     }

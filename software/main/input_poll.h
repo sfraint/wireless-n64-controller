@@ -49,8 +49,8 @@
 // GPIO 34
 #define SIXPIN_ANALOG_YQ             13
 #define GPIO_INPUT_PIN_SEL  ((1ULL<<SIXPIN_ANALOG_X) | (1ULL<<SIXPIN_ANALOG_XQ) | (1ULL<<SIXPIN_ANALOG_Y) | (1ULL<<SIXPIN_ANALOG_YQ))
-// Factor to multiply raw 6-pin output to achieve a joystick value (-32767 to 32767). Should be adjusted for stick wear.
-#define factor  800
+// Factor to adjust raw 6-pin output into positive range. 
+#define SIXPIN_SCALE_ADJUSTMENT ANALOG_MAX/2
 
 // TODO add calibration function
 // Amount to add to analog readings (pre scaling)
@@ -96,7 +96,8 @@
 
 // Approx. min, centered, and max ADC readings for joystick potentiometers
 #define ANALOG_MIN        0
-#define ANALOG_MAX        3900
+//4PIN - 3900, SIXPIN - adjust for stickwear, new unwore stick is 90
+#define ANALOG_MAX        130 
 #define ANALOG_CENTER     (ANALOG_MAX/2)
 // Multiplier to apply to scaled analog readings
 // Should be higher than 1 so the max value can be hit consistently
@@ -139,6 +140,7 @@ extern uint16_t max_y;
 
 
 uint16_t get_analog_raw(adc1_channel_t pin);
+uint16_t get_sixpin_count(int type);
 bool poll_buttons();
 bool poll_dpad();
 void input_poll_loop(void* args);

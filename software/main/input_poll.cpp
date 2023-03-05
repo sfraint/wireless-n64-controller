@@ -14,10 +14,6 @@
 //#define DEBUG 1
 #include "debug.h"
 
-// When an edge change is detected used to count movement
-int countx = 0;
-int county = 0;
-
 // Setup Queue for interrupts to use
 static xQueueHandle gpio_sixpin_queue = NULL;
 
@@ -48,6 +44,7 @@ uint32_t previousButtonStates[NUM_OF_BUTTONS];
 uint32_t currentButtonStates[NUM_OF_BUTTONS];
 uint32_t previousSoftButtonStates[NUM_OF_SOFT_BUTTONS];
 uint32_t currentSoftButtonStates[NUM_OF_SOFT_BUTTONS];
+
 int16_t previousXState;
 int16_t currentXState;
 int16_t previousYState;
@@ -59,7 +56,9 @@ uint32_t previousDpadStates[4];
 uint32_t currentDpadStates[4];
 uint32_t dpadPins[4] = {25, 27, 26, 33};
 
-
+// When an edge change is detected used to count movement
+int countx = 0;
+int county = 0;
 // Analog input center and range
 uint16_t center_x = ANALOG_CENTER;
 uint16_t min_x = ANALOG_MIN;
@@ -73,10 +72,11 @@ static void IRAM_ATTR gpiox_isr_handler(void* arg)
 {
     uint32_t gpio_num = (uint32_t) arg;
     if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_X) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_XQ)){ 
-                        countx=countx+factor;
+                        //countx=countx+factor;
+                        countx++;
                     }
                     else{
-                        countx=countx-factor;
+                        countx--;
                     }    
                 
     xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
@@ -86,10 +86,10 @@ static void IRAM_ATTR gpioy_isr_handler(void* arg)
 {
        uint32_t gpio_num = (uint32_t) arg;
     if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_Y) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_YQ)){ 
-                        county=county+factor;
+                        county--;
                     }
                     else{
-                        county=county-factor;
+                        county++;
                     }    
                 
     xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
@@ -101,8 +101,19 @@ static void gpio_task_sixpin(void* arg)
     while(true) {
         if(xQueueReceive(gpio_sixpin_queue, &io_num, portMAX_DELAY)) {
             //printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
-             printf("countx val: %d & countx val: %d\n", countx, county);           
+             //printf("countx val: %d & countx val: %d\n", countx, county);           
         }
+    }
+     
+}
+
+//Return countx and county values 0 = countx
+uint16_t get_sixpin_count(int type) {
+    if(type == 0){
+        return countx;
+    }
+    else{
+        return county;
     }
      
 }
@@ -110,6 +121,7 @@ static void gpio_task_sixpin(void* arg)
 // Scale x from `in` range to `out` range
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    
 }
 
 
@@ -133,14 +145,22 @@ int16_t analog_to_joystick_value(uint16_t raw, uint16_t min, uint16_t med, uint1
 
     // Negative
     if (raw < med) {
-        int32_t joystick_val = map(raw, min, med, JOYSTICK_MIN, 0) * ANALOG_OVERSCALE;
+        int32_t joystick_val = map(raw, min, med, JOYSTICK_MIN, 0) ;
+        printf("joystick_val val before scaling : %d \n", joystick_val);
+        joystick_val = joystick_val * ANALOG_OVERSCALE;
+printf("joystick_val val after scaling: %d \n", joystick_val);
         if (joystick_val < JOYSTICK_MIN) return JOYSTICK_MIN;
+        
         return (int16_t) joystick_val;
     }
 
     // Positive
-    int32_t joystick_val = map(raw, med, max, 0, JOYSTICK_MAX) * ANALOG_OVERSCALE;
+    int32_t joystick_val = map(raw, med, max, 0, JOYSTICK_MAX);
+    printf("joystick_val valbefore scaling : %d \n", joystick_val);
+    joystick_val = joystick_val * ANALOG_OVERSCALE;
+    printf("joystick_val val after scaling: %d \n", joystick_val);
     if (joystick_val > JOYSTICK_MAX) return JOYSTICK_MAX;
+
     return (int16_t) joystick_val;
 }
 
@@ -225,7 +245,7 @@ bool poll_joystick() {
 
     // X
     if(SIXPIN_ENABLED){
-    currentXState = countx;
+    currentXState = analog_to_joystick_value(countx+SIXPIN_SCALE_ADJUSTMENT, min_x, center_x, max_x);
     }
     else{
     currentXState = analog_to_joystick_value(get_analog_raw(ANALOG_X), min_x, center_x, max_x);
@@ -242,7 +262,7 @@ bool poll_joystick() {
 
     // Y
     if(SIXPIN_ENABLED){
-    currentYState = county;
+    currentYState = analog_to_joystick_value(county+SIXPIN_SCALE_ADJUSTMENT, min_y, center_y, max_y);;
     }
     else{
     currentYState = analog_to_joystick_value(get_analog_raw(ANALOG_Y), min_y, center_y, max_y);
