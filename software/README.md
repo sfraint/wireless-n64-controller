@@ -4,8 +4,30 @@ This subdirectory contains source code for the software that runs on the ESP32, 
 
 Note: This uses a slightly modified version of [`ESP32-BLE-Gamepad`](https://github.com/lemmingDev/ESP32-BLE-Gamepad) which is MIT licensed, see the included copy of the BLE gamepad license in the `ESP32-BLE-Gamepad/` source directory.
 
+### Quickstart Setup (Docker)
 
-### Setup
+With docker, setting up and building this project is easy:
+
+1. Clone this project if you haven't already: `git clone https://github.com/sfraint/wireless-n64-controller.git`
+
+1. cd into the software directory: `cd wireless-n64-controller/software`
+
+1. Set up NimBLE 1.3.1:
+
+```
+mkdir components
+cd components
+wget https://github.com/h2zero/esp-nimble-cpp/archive/refs/tags/1.3.1.zip
+unzip 1.3.1.zip
+```
+
+1. Build the project: `docker run -v $PWD:/project -w /project espressif/idf:v4.4.3 idf.py build`
+
+1. (_Note: This doesn't work on Mac_) Flash the project onto the ESP32: `docker run --rm --device=/dev/ttyUSB0 -v $PWD:/project -w /project espressif/idf:v4.4.3 idf.py -p /dev/ttyUSB0 -b 115200 flash`
+   - replace `/dev/ttyUSB0` with `/dev/ttyACM0` or whatever device corresponds to your ESP32
+
+
+### Regular Setup
 
 This project requires `ESP-IDF` (works with version 4.4) and `NimBLE-cpp` (currently requires an older version, 1.3).
 
@@ -13,7 +35,7 @@ This project requires `ESP-IDF` (works with version 4.4) and `NimBLE-cpp` (curre
 
 2. Clone this project if you haven't already, e.g. `git clone https://github.com/sfraint/wireless-n64-controller.git`
 
-3. Setup NimBLE 1.3.1
+3. Set up NimBLE 1.3.1
 
    - Create a `components` directory within the `software` directory in this project
 
