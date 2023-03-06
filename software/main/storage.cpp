@@ -52,7 +52,7 @@ uint32_t read_storage_value(char* name, uint32_t default_value) {
 
 
 // Write a trio of values to storage
-bool write_storage_values(char* name1, uint32_t value1, char* name2, uint32_t value2, char* name3, uint32_t value3) {
+bool write_storage_values(char* name1, uint32_t value1, char* name2, uint32_t value2, char* name3, uint32_t value3, char* name4, uint32_t value4) {
     bool success = true;
     esp_err_t err;
 
@@ -77,6 +77,11 @@ bool write_storage_values(char* name1, uint32_t value1, char* name2, uint32_t va
         printf("Failed to write %s\n", name2);
     }
     err = handle->set_item(name3, value3);
+    if (err != ESP_OK) {
+        success = false;
+        printf("Failed to write %s\n", name3);
+    }
+    err = handle->set_item(name4, value4);
     if (err != ESP_OK) {
         success = false;
         printf("Failed to write %s\n", name3);

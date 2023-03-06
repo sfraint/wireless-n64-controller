@@ -101,7 +101,9 @@
 #define ANALOG_CENTER     (ANALOG_MAX/2)
 // Multiplier to apply to scaled analog readings
 // Should be higher than 1 so the max value can be hit consistently
-#define ANALOG_OVERSCALE  3/2
+// 4PIN default should be 3/2
+// SIXPIN should be set to 1.1
+#define ANALOG_OVERSCALE  1.1
 // Values used by BleGamepad joystick
 #define JOYSTICK_MIN      -32767
 #define JOYSTICK_MAX      32767
@@ -134,13 +136,13 @@ extern uint32_t physicalButtons[NUM_OF_BUTTONS];
 extern uint16_t center_x;
 extern uint16_t min_x;
 extern uint16_t max_x;
+extern uint16_t factor_x;
 extern uint16_t center_y;
 extern uint16_t min_y;
 extern uint16_t max_y;
-
+extern uint16_t factor_y;
 
 uint16_t get_analog_raw(adc1_channel_t pin);
-uint16_t get_sixpin_count(int type);
 bool poll_buttons();
 bool poll_dpad();
 void input_poll_loop(void* args);

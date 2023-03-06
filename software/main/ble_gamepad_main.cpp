@@ -30,8 +30,63 @@ bool startup_routine_running = true;
 
 BleGamepad bleGamepad;
 xQueueHandle gpio_evt_queue = NULL; // Button-press event queue
+// Setup Queue for interrupts to use
+static xQueueHandle gpio_sixpin_queue = NULL;
+// When an edge change is detected used to count movement
+int countx = 0;
+int county = 0;
+// Setup Var to hold Factor to move joystick to positive range
+uint16_t factor_x = 0;
+uint16_t factor_y = 0;
+// X Interrupt Hook 
+static void IRAM_ATTR gpiox_isr_handler(void* arg)
+{
+    uint32_t gpio_num = (uint32_t) arg;
+    if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_X) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_XQ)){ 
+                        countx++;
+                    }
+                    else{
+                        countx--;
+                    }    
+                
+    xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
+}
+// Y Interrupt Hook
+static void IRAM_ATTR gpioy_isr_handler(void* arg)
+{
+       uint32_t gpio_num = (uint32_t) arg;
+    if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_Y) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_YQ)){ 
+                        county--;
+                    }
+                    else{
+                        county++;
+                    }    
+                
+    xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
+}
+// Task to remove Interrupt messages from queues
+static void gpio_task_sixpin(void* arg)
+{
+    uint32_t io_num;
+    while(true) {
+        if(xQueueReceive(gpio_sixpin_queue, &io_num, portMAX_DELAY)) {
+            //printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
+            //printf("countx val: %d & countx val: %d\n", countx, county);           
+        }
+    }
+     
+}
 
-
+//Return countx and county values 0 = countx
+uint16_t get_sixpin_count(int32_t type) {
+    if(type == 0){
+        return countx+factor_x;
+    }
+    else{
+        return county+factor_y;
+    }
+     
+}
 // Setup specified pin number as pulled-down, input pin
 void setup_input_pin(uint32_t pin) {
     gpio_config_t io_conf;
@@ -78,6 +133,18 @@ void setup_gpio()
         //enable pull-up mode
         io_conf.pull_up_en = (gpio_pullup_t) 0;
         gpio_config(&io_conf);
+        
+        //SIXPIN Joystick Interrupts and Tasks setup
+        //create a queue to handle gpio event from isr
+        gpio_sixpin_queue = xQueueCreate(10, sizeof(uint32_t));
+        //start gpio task
+        xTaskCreate(gpio_task_sixpin, "gpio_task_sixpin", 2048, NULL, 10, NULL);
+        //install gpio isr service
+        gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+        //hook isr handler for specific gpio pin
+        gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_X, gpiox_isr_handler, (void*) SIXPIN_ANALOG_X);
+        //hook isr handler for specific gpio pin
+        gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_Y, gpioy_isr_handler, (void*) SIXPIN_ANALOG_Y);
     }
     else{
     adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);
@@ -247,56 +314,76 @@ void calibrate(bool write_to_storage) {
 
         vTaskDelay(xDelay);
     }
+
     printf("Calibration results:\n");
     printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
     printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);
     if (write_to_storage) {
-        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x);
-        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y);
+        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x, STORAGE_KEY_X_FACTOR, factor_x);
+        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y, STORAGE_KEY_Y_FACTOR, factor_y);
         printf("Calibration data written to storage\n");
     }
 }
 
-double absolute_value(int value) {
+uint16_t absolute_value(int32_t value) {
     if (value < 0) {
         return -value;
     } else {
         return 0;
     }
 }
-// Calibrate SIXPIN X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~5 seconds to determine range.
+// Calibrate SIXPIN X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~10 seconds to determine range.
 void calibrate_sixpin(bool write_to_storage) {
     const TickType_t xDelay = 10 / portTICK_PERIOD_MS;  // 10ms
+    int32_t mn_x = 0;
+    int32_t mx_x = 0;
+    int32_t mn_y = 0;
+    int32_t mx_y = 0;   
+    center_x = countx;
+    mn_x = center_x;
+    mx_x = center_x;
 
-    // Read extreme values for ~5 seconds
-    for (int i = 0; i < 500; i++) {
-        uint16_t x = get_sixpin_count(0);
-        if (x < min_x) min_x = x;
-        if (x > max_x) max_x = x;
+    center_y = county;
+    mn_y = center_y;
+    mx_y = center_y;
 
-        uint16_t y = get_sixpin_count(1);
-        if (y < min_y) min_y = y;
-        if (y > max_y) max_y = y;
+printf(" min x: %d,max x: %d, min y: %d, max y: %d\n", mn_x, mx_x, mn_y, mx_y);
+    // Read extreme values for ~10 seconds
+    for (int i = 0; i < 1000; i++) {
+        int32_t x = countx;
+
+        if (x < mn_x) mn_x = x;
+        if (x > mx_x) mx_x = x;
+
+        int32_t y = county;
+        if (y < mn_y) mn_y = y;
+        if (y > mx_y) mx_y = y;
 
         vTaskDelay(xDelay);
     }
 
-    int factor = absolute_value(min_y);
+    mn_x = (mn_x /2)*2;
+    mx_x = (mx_x /2)*2;
+    mn_y = (mn_y /2)*2;
+    mx_y = (mx_y /2)*2;
 
-    min_y = min_y + factor;
-    max_y = max_y + factor;
+    factor_y = absolute_value(mn_y);
+    factor_x = absolute_value(mn_x);  
+    printf("factor y: %d,factor x: %d, min x: %d,max x: %d, min y: %d, max y: %d\n", factor_y,factor_x, mn_x, mx_x, mn_y, mx_y);
+    min_y = mn_y + factor_y;
+    max_y = mx_y + factor_y;
     center_y = max_y / 2;
 
-    min_x = min_x + factor;
-    max_x = max_x + factor;
+    min_x = mn_x + factor_x;
+    max_x = mx_x + factor_x;
     center_x = max_x / 2;
 
     printf("Calibration results:\n");
     printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
     printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);
     if (write_to_storage) {
-        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x);
-        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y);
+        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x, STORAGE_KEY_X_FACTOR, factor_x);
+        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y, STORAGE_KEY_Y_FACTOR, factor_y);
         printf("Calibration data written to storage\n");
     }
 }
@@ -335,12 +422,14 @@ void app_main(void)
         center_x = read_storage_value(STORAGE_KEY_X_CENTER, ANALOG_CENTER);
         min_x = read_storage_value(STORAGE_KEY_X_MIN, ANALOG_MIN);
         max_x = read_storage_value(STORAGE_KEY_X_MAX, ANALOG_MAX);
+        factor_x = read_storage_value(STORAGE_KEY_X_FACTOR, factor_x);
         center_y = read_storage_value(STORAGE_KEY_Y_CENTER, ANALOG_CENTER);
         min_y = read_storage_value(STORAGE_KEY_Y_MIN, ANALOG_MIN);
         max_y = read_storage_value(STORAGE_KEY_Y_MAX, ANALOG_MAX);
+        factor_y = read_storage_value(STORAGE_KEY_Y_FACTOR, factor_y);
         printf("Read joystick calibration values:\n");
-        printf("    X: %d, %d, %d\n", min_x, center_x, max_x);
-        printf("    Y: %d, %d, %d\n", min_y, center_y, max_y);
+        printf("    X: %d, %d, %d, %d\n", min_x, center_x, max_x, factor_x);
+        printf("    Y: %d, %d, %d, %d\n", min_y, center_y, max_y, factor_y);
     }
 
     printf("Initial setup complete!\n");
