@@ -84,7 +84,7 @@ bool write_storage_values(char* name1, uint32_t value1, char* name2, uint32_t va
     err = handle->set_item(name4, value4);
     if (err != ESP_OK) {
         success = false;
-        printf("Failed to write %s\n", name3);
+        printf("Failed to write %s\n", name4);
     }
     // Bail if any writes failed
     if (!success) return false;

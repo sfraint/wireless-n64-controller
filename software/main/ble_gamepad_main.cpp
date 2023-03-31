@@ -30,8 +30,6 @@ bool startup_routine_running = true;
 
 BleGamepad bleGamepad;
 xQueueHandle gpio_evt_queue = NULL; // Button-press event queue
-// Setup Queue for interrupts to use
-static xQueueHandle gpio_sixpin_queue = NULL;
 // When an edge change is detected used to count movement
 int countx = 0;
 int county = 0;
@@ -48,8 +46,7 @@ static void IRAM_ATTR gpiox_isr_handler(void* arg)
                     else{
                         countx--;
                     }    
-                
-    xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
+                     
 }
 // Y Interrupt Hook
 static void IRAM_ATTR gpioy_isr_handler(void* arg)
@@ -60,29 +57,18 @@ static void IRAM_ATTR gpioy_isr_handler(void* arg)
                     }
                     else{
                         county++;
-                    }    
-                
-    xQueueSendFromISR(gpio_sixpin_queue, &gpio_num, NULL);
+                    } 
 }
-// Task to remove Interrupt messages from queues
-static void gpio_task_sixpin(void* arg)
-{
-    uint32_t io_num;
-    while(true) {
-        if(xQueueReceive(gpio_sixpin_queue, &io_num, portMAX_DELAY)) {
-            //printf("GPIO[%d] intr, val: %d\n", io_num, gpio_get_level(io_num));
-            //printf("countx val: %d & countx val: %d\n", countx, county);           
-        }
-    }
-     
-}
+
 
 //Return countx and county values 0 = countx
 uint16_t get_sixpin_count(int32_t type) {
     if(type == 0){
+        //printf("X: %d\n",countx);
         return countx+factor_x;
     }
     else{
+        //printf("X: %d\n",county);
         return county+factor_y;
     }
      
@@ -118,33 +104,37 @@ void setup_gpio()
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
 
-    // Joystick setup
+    // SIXPIN Joystick setup
     if(SIXPIN_ENABLED){
         //zero-initialize the config structure.
         gpio_config_t io_conf = {};
         //disable pull-down mode
         io_conf.pull_down_en = (gpio_pulldown_t) 0;
-        //interrupt of rising edge
+        //interrupt of any edge
         io_conf.intr_type = GPIO_INTR_ANYEDGE;
-        //bit mask of the pins, use GPIO4/5 here
+        //bit mask of the pins
         io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;
         //set as input mode
         io_conf.mode = GPIO_MODE_INPUT;
-        //enable pull-up mode
+        //disable pull-up mode
         io_conf.pull_up_en = (gpio_pullup_t) 0;
         gpio_config(&io_conf);
         
-        //SIXPIN Joystick Interrupts and Tasks setup
-        //create a queue to handle gpio event from isr
-        gpio_sixpin_queue = xQueueCreate(10, sizeof(uint32_t));
-        //start gpio task
-        xTaskCreate(gpio_task_sixpin, "gpio_task_sixpin", 2048, NULL, 10, NULL);
+        //SIXPIN Joystick Interrupts and Handler setup
         //install gpio isr service
         gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
         //hook isr handler for specific gpio pin
         gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_X, gpiox_isr_handler, (void*) SIXPIN_ANALOG_X);
         //hook isr handler for specific gpio pin
         gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_Y, gpioy_isr_handler, (void*) SIXPIN_ANALOG_Y);
+
+        //Adjust max ADC reading for SIXPIN joystick potentiometers
+        max_x = SIXPIN_ANALOG_MAX; 
+        max_y = SIXPIN_ANALOG_MAX;
+        center_x = SIXPIN_ANALOG_CENTER;
+        center_y = SIXPIN_ANALOG_CENTER;
+        factor_x = 40;
+        factor_y = 40;
     }
     else{
     adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);
@@ -325,7 +315,8 @@ void calibrate(bool write_to_storage) {
     }
 }
 
-uint16_t absolute_value(int32_t value) {
+//remove the - from values to convert to positive.
+uint16_t convert_positive(int32_t value) {
     if (value < 0) {
         return -value;
     } else {
@@ -347,7 +338,7 @@ void calibrate_sixpin(bool write_to_storage) {
     mn_y = center_y;
     mx_y = center_y;
 
-printf(" min x: %d,max x: %d, min y: %d, max y: %d\n", mn_x, mx_x, mn_y, mx_y);
+ 
     // Read extreme values for ~10 seconds
     for (int i = 0; i < 1000; i++) {
         int32_t x = countx;
@@ -358,17 +349,19 @@ printf(" min x: %d,max x: %d, min y: %d, max y: %d\n", mn_x, mx_x, mn_y, mx_y);
         int32_t y = county;
         if (y < mn_y) mn_y = y;
         if (y > mx_y) mx_y = y;
-
+        printf(" min x: %d,max x: %d, min y: %d, max y: %d\n", mn_x, mx_x, mn_y, mx_y);
         vTaskDelay(xDelay);
     }
-
+    
+    // Convert to even number to prevent non centered stick when calibrating
     mn_x = (mn_x /2)*2;
     mx_x = (mx_x /2)*2;
     mn_y = (mn_y /2)*2;
     mx_y = (mx_y /2)*2;
 
-    factor_y = absolute_value(mn_y);
-    factor_x = absolute_value(mn_x);  
+    // Create factor and move range positive
+    factor_y = convert_positive(mn_y);
+    factor_x = convert_positive(mn_x);  
     printf("factor y: %d,factor x: %d, min x: %d,max x: %d, min y: %d, max y: %d\n", factor_y,factor_x, mn_x, mx_x, mn_y, mx_y);
     min_y = mn_y + factor_y;
     max_y = mx_y + factor_y;
@@ -378,6 +371,7 @@ printf(" min x: %d,max x: %d, min y: %d, max y: %d\n", mn_x, mx_x, mn_y, mx_y);
     max_x = mx_x + factor_x;
     center_x = max_x / 2;
 
+    // Show results and save to storage
     printf("Calibration results:\n");
     printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
     printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);

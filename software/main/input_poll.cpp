@@ -63,8 +63,6 @@ uint16_t center_y = ANALOG_CENTER;
 uint16_t min_y = ANALOG_MIN;
 uint16_t max_y = ANALOG_MAX;
 
-
-
 // Scale x from `in` range to `out` range
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
@@ -94,7 +92,13 @@ int16_t analog_to_joystick_value(uint16_t raw, uint16_t min, uint16_t med, uint1
     if (raw < med) {
         int32_t joystick_val = map(raw, min, med, JOYSTICK_MIN, 0) ;
        // printf("negative joystick_val val before scaling : %d \n", joystick_val);
+        if(SIXPIN_ENABLED)
+        {
+        joystick_val = joystick_val * SIXPIN_ANALOG_OVERSCALE;
+        }
+        else{
         joystick_val = joystick_val * ANALOG_OVERSCALE;
+        }
         //printf("joystick_val val after scaling: %d \n", joystick_val);
         if (joystick_val < JOYSTICK_MIN) return JOYSTICK_MIN;
         
@@ -104,7 +108,13 @@ int16_t analog_to_joystick_value(uint16_t raw, uint16_t min, uint16_t med, uint1
     // Positive
     int32_t joystick_val = map(raw, med, max, 0, JOYSTICK_MAX);
     //printf("positive joystick_val valbefore scaling : %d \n", joystick_val);
-    joystick_val = joystick_val * ANALOG_OVERSCALE;
+    if(SIXPIN_ENABLED)
+    {
+        joystick_val = joystick_val * SIXPIN_ANALOG_OVERSCALE;
+    }
+    else{
+        joystick_val = joystick_val * ANALOG_OVERSCALE;
+    }
     //printf("joystick_val val after scaling: %d \n", joystick_val);
     if (joystick_val > JOYSTICK_MAX) return JOYSTICK_MAX;
 
