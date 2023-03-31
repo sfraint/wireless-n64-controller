@@ -37,7 +37,7 @@
 
 // 6-Pin OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
 //Enable SIXPIN Stick - If set to 0 then four pin analog enabled
-#define SIXPIN_ENABLED  1
+#define SIXPIN_ENABLED  0
 #define ESP_INTR_FLAG_DEFAULT 0
 // GPIO 39
 #define SIXPIN_ANALOG_X     39
