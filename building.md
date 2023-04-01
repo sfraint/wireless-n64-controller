@@ -72,7 +72,7 @@ Components:
 
    If using the OEM controller, the 6-pin connector needs modifying to work with the current PCB until this is updated. Carefully bend two of the pins up so the header/connector fits into the 4 pin position on the PCB. Then two additional wires are required to be soldered from these bent pins to the correct ESP32 Pins on the PCB (6 -> Pin 13,5 -> Pin 35) as per the picture below:
 
-   <img src=images/6pin_header.png width=360>
+   <img src=images/6pin_header.jpg width=360>
 
    Additionally, for the 6 Pin connectors the wires from the joystick need swapping around in the 6pin header to match the PCB (a small screwdriver can be used to lift the holding clips and release the wires from the connector):
 
@@ -96,7 +96,7 @@ Components:
    
    (More information can be found here: https://dpedu.io/article/2015-03-11/nintendo-64-joystick-pinout-arduino)
 
-   <img src=images/6pin_header_after.png width=360>
+   <img src=images/6pin_header_after.jpg width=360>
 
 6. **4-pin cables**: Solder the 4-pin PH cable to the analog joystick board (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
 
