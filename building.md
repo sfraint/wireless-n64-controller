@@ -72,11 +72,11 @@ Components:
 
    If using the OEM controller, the 6-pin connector needs modifying to work with the current PCB until this is updated. Carefully bend two of the pins up so the header/connector fits into the 4 pin position on the PCB. Then two additional wires are required to be soldered from these bent pins to the correct ESP32 Pins on the PCB (6 -> Pin 13,5 -> Pin 35) as per the picture below:
 
-   <img src=images/6pin_pcb.png width=360>
+   <img src=images/6pin_header.png width=360>
 
    Additionally, for the 6 Pin connectors the wires from the joystick need swapping around in the 6pin header to match the PCB (a small screwdriver can be used to lift the holding clips and release the wires from the connector):
 
-   <img src=images/6pin_PCB.png width=360>
+   <img src=images/6pin_pcb.png width=360>
 
    * Pin 1 - X
    * Pin 2 - Power 
