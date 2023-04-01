@@ -45,8 +45,8 @@ Alternatively, you could skip using a battery pak and directly plug/wire a batte
 You will need to flash the software for this project on your ESP32 microcontroller. After `ESP-IDF` is setup on your PC, you can connect the microcontroller to your PC via USB and build and flash the software.
 
 If you are using and OEM controller the software must be updated to enable SIXPIN mode before building:
-input_poll.h
-#define SIXPIN_ENABLED  1
+
+input_poll.h - #define SIXPIN_ENABLED  1
  
 See [software readme](software/README.md) for more details.
 
