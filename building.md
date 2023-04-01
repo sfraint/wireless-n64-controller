@@ -10,6 +10,7 @@ See the [BOM for more details and some example-component links](BOM.md), but you
 
 * Base N64 controller you plan to modify.
    * I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
+   * OEM controllers use a 6 pin connector compared to the cheaper alternatives which use a 4 pin. Additional steps are required to configure the software as well as modifications to the PCB for an OEM 6 pin controller.
 * ESP32 microcontroller
 * AAA terminals
 * LiPo battery
@@ -42,6 +43,10 @@ Alternatively, you could skip using a battery pak and directly plug/wire a batte
 ### 1. Program the microcontroller
 
 You will need to flash the software for this project on your ESP32 microcontroller. After `ESP-IDF` is setup on your PC, you can connect the microcontroller to your PC via USB and build and flash the software.
+
+If you are using and OEM controller the software must be updated to enable SIXPIN mode before building:
+input_poll.h
+#define SIXPIN_ENABLED  1
  
 See [software readme](software/README.md) for more details.
 
