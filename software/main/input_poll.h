@@ -99,7 +99,7 @@
 
 // Approx. min, centered, and max ADC readings for joystick potentiometers
 #define ANALOG_MIN        0
-#define ANALOG_MAX        130 
+#define ANALOG_MAX        3900 
 #define ANALOG_CENTER     (ANALOG_MAX/2)
 // Multiplier to apply to scaled analog readings
 // Should be higher than 1 so the max value can be hit consistently

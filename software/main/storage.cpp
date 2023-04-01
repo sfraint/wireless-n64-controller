@@ -51,7 +51,7 @@ uint32_t read_storage_value(char* name, uint32_t default_value) {
 }
 
 
-// Write a trio of values to storage
+// Write a quad of values to storage
 bool write_storage_values(char* name1, uint32_t value1, char* name2, uint32_t value2, char* name3, uint32_t value3, char* name4, uint32_t value4) {
     bool success = true;
     esp_err_t err;
