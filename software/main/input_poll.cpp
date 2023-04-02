@@ -260,10 +260,11 @@ void input_poll_loop(void* args)
         bool changed = false;
         
         // Battery
-        if (ENABLE_BATTERY_CHECK) {
-            bleGamepad.setBatteryLevel(get_battery_level());
+        if (!SIXPIN_ENABLED){
+            if (ENABLE_BATTERY_CHECK) {
+                bleGamepad.setBatteryLevel(get_battery_level());
+            }
         }
-
         // Joystick
         bool joystick_changed = poll_joystick();
         changed |= joystick_changed;

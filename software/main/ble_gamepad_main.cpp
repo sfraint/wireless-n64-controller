@@ -106,7 +106,7 @@ void setup_gpio()
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
     }   
-    
+
     // SIXPIN Joystick setup
     if(SIXPIN_ENABLED){
         //zero-initialize the config structure.
@@ -318,14 +318,6 @@ void calibrate(bool write_to_storage) {
     }
 }
 
-//remove the - from values to convert to positive.
-uint16_t convert_positive(int32_t value) {
-    if (value < 0) {
-        return -value;
-    } else {
-        return 0;
-    }
-}
 // Calibrate SIXPIN X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~10 seconds to determine range.
 void calibrate_sixpin(bool write_to_storage) {
     const TickType_t xDelay = 10 / portTICK_PERIOD_MS;  // 10ms
@@ -363,8 +355,8 @@ void calibrate_sixpin(bool write_to_storage) {
     mx_y = (mx_y /2)*2;
 
     // Create factor and move range positive
-    factor_y = convert_positive(mn_y);
-    factor_x = convert_positive(mn_x);  
+    factor_y = abs(mn_y);
+    factor_x = abs(mn_x);  
     printf("factor y: %d,factor x: %d, min x: %d,max x: %d, min y: %d, max y: %d\n", factor_y,factor_x, mn_x, mx_x, mn_y, mx_y);
     min_y = mn_y + factor_y;
     max_y = mx_y + factor_y;
