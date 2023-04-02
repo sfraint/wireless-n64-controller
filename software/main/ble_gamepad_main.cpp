@@ -100,10 +100,13 @@ void setup_gpio()
         previousDpadStates[i] = 0;
         currentDpadStates[i] =  0;
     }
-    // Analog in
+
+    // Battery Monitor, Pin also used with 6 pin Joystick, therefore only availble with 4 pin joysticks
+    if(!SIXPIN_ENABLED){
     adc1_config_width(ADC_WIDTH_BIT_12);
     adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
-
+    }   
+    
     // SIXPIN Joystick setup
     if(SIXPIN_ENABLED){
         //zero-initialize the config structure.
