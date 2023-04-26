@@ -65,11 +65,11 @@ static void IRAM_ATTR gpioy_isr_handler(void* arg)
 uint16_t get_sixpin_count(int32_t type) {
     if(type == 0){
         //printf("X: %d\n",countx);
-        return countx+factor_x;
+        return countx+abs(min_x);
     }
     else{
         //printf("X: %d\n",county);
-        return county+factor_y;
+        return county+abs(min_y);
     }
      
 }
@@ -283,25 +283,29 @@ extern "C" {
 }
 
 
-// Calibrate analog X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~5 seconds to determine range.
+// Calibrate analog X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~10 seconds to determine range. 
 void calibrate(bool write_to_storage) {
     const TickType_t xDelay = 10 / portTICK_PERIOD_MS;  // 10ms
 
-    center_x = get_analog_raw(ANALOG_X);
+    if (SIXPIN_ENABLED){center_x = 0;} else{center_x = get_analog_raw(ANALOG_X);};
     min_x = center_x;
     max_x = center_x;
 
-    center_y = get_analog_raw(ANALOG_Y);
+    if (SIXPIN_ENABLED){center_y = 0;} else{center_y = get_analog_raw(ANALOG_Y);};
     min_y = center_y;
     max_y = center_y;
 
-    // Read extreme values for ~5 seconds
-    for (int i = 0; i < 500; i++) {
-        uint16_t x = get_analog_raw(ANALOG_X);
+    // Read extreme values for ~10 seconds
+    for (int i = 0; i < 1000; i++) {
+        int32_t  x;
+        if (SIXPIN_ENABLED) {x = countx;} else{x = get_analog_raw(ANALOG_X);};
+        
         if (x < min_x) min_x = x;
         if (x > max_x) max_x = x;
 
-        uint16_t y = get_analog_raw(ANALOG_Y);
+        int32_t  y;
+        if (SIXPIN_ENABLED) {y = county;} else{y = get_analog_raw(ANALOG_Y);};
+       
         if (y < min_y) min_y = y;
         if (y > max_y) max_y = y;
 
@@ -312,67 +316,8 @@ void calibrate(bool write_to_storage) {
     printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
     printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);
     if (write_to_storage) {
-        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x, STORAGE_KEY_X_FACTOR, factor_x);
-        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y, STORAGE_KEY_Y_FACTOR, factor_y);
-        printf("Calibration data written to storage\n");
-    }
-}
-
-// Calibrate SIXPIN X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~10 seconds to determine range.
-void calibrate_sixpin(bool write_to_storage) {
-    const TickType_t xDelay = 10 / portTICK_PERIOD_MS;  // 10ms
-    int32_t mn_x = 0;
-    int32_t mx_x = 0;
-    int32_t mn_y = 0;
-    int32_t mx_y = 0;   
-    center_x = countx;
-    mn_x = center_x;
-    mx_x = center_x;
-
-    center_y = county;
-    mn_y = center_y;
-    mx_y = center_y;
-
- 
-    // Read extreme values for ~10 seconds
-    for (int i = 0; i < 1000; i++) {
-        int32_t x = countx;
-
-        if (x < mn_x) mn_x = x;
-        if (x > mx_x) mx_x = x;
-
-        int32_t y = county;
-        if (y < mn_y) mn_y = y;
-        if (y > mx_y) mx_y = y;
-        printf(" min x: %d,max x: %d, min y: %d, max y: %d\n", mn_x, mx_x, mn_y, mx_y);
-        vTaskDelay(xDelay);
-    }
-    
-    // Convert to even number to prevent non centered stick when calibrating
-    mn_x = (mn_x /2)*2;
-    mx_x = (mx_x /2)*2;
-    mn_y = (mn_y /2)*2;
-    mx_y = (mx_y /2)*2;
-
-    // Create factor and move range positive
-    factor_y = abs(mn_y);
-    factor_x = abs(mn_x);  
-    printf("factor y: %d,factor x: %d, min x: %d,max x: %d, min y: %d, max y: %d\n", factor_y,factor_x, mn_x, mx_x, mn_y, mx_y);
-    min_y = mn_y + factor_y;
-    max_y = mx_y + factor_y;
-    center_y = max_y / 2;
-
-    min_x = mn_x + factor_x;
-    max_x = mx_x + factor_x;
-    center_x = max_x / 2;
-
-    // Show results and save to storage
-    printf("Calibration results:\n");
-    printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
-    printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);
-    if (write_to_storage) {
-        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x, STORAGE_KEY_X_FACTOR, factor_x);
-        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y, STORAGE_KEY_Y_FACTOR, factor_y);
+        write_storage_values(STORAGE_KEY_X_CENTER, center_x, STORAGE_KEY_X_MIN, min_x, STORAGE_KEY_X_MAX, max_x);
+        write_storage_values(STORAGE_KEY_Y_CENTER, center_y, STORAGE_KEY_Y_MIN, min_y, STORAGE_KEY_Y_MAX, max_y);
         printf("Calibration data written to storage\n");
     }
 }
@@ -397,12 +342,7 @@ void app_main(void)
     if (currentButtonStates[6]) {
         current_state = STATE_CALIBRATION;
         printf("Starting calibration\n");
-        if(SIXPIN_ENABLED){
-            calibrate_sixpin(storage_ok);
-        }
-        else{
-            calibrate(storage_ok);
-        }
+        calibrate(storage_ok);
     } else {
         printf("Skipping calibration\n");
     }
@@ -411,14 +351,12 @@ void app_main(void)
         center_x = read_storage_value(STORAGE_KEY_X_CENTER, ANALOG_CENTER);
         min_x = read_storage_value(STORAGE_KEY_X_MIN, ANALOG_MIN);
         max_x = read_storage_value(STORAGE_KEY_X_MAX, ANALOG_MAX);
-        factor_x = read_storage_value(STORAGE_KEY_X_FACTOR, factor_x);
         center_y = read_storage_value(STORAGE_KEY_Y_CENTER, ANALOG_CENTER);
         min_y = read_storage_value(STORAGE_KEY_Y_MIN, ANALOG_MIN);
         max_y = read_storage_value(STORAGE_KEY_Y_MAX, ANALOG_MAX);
-        factor_y = read_storage_value(STORAGE_KEY_Y_FACTOR, factor_y);
         printf("Read joystick calibration values:\n");
-        printf("    X: %d, %d, %d, %d\n", min_x, center_x, max_x, factor_x);
-        printf("    Y: %d, %d, %d, %d\n", min_y, center_y, max_y, factor_y);
+        printf("    X: %d, %d, %d\n", min_x, center_x, max_x);
+        printf("    Y: %d, %d, %d\n", min_y, center_y, max_y);
     }
 
     printf("Initial setup complete!\n");

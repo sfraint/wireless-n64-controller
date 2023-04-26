@@ -56,12 +56,12 @@ uint32_t dpadPins[4] = {25, 27, 26, 33};
 
 
 // Analog input center and range
-uint16_t center_x = ANALOG_CENTER;
-uint16_t min_x = ANALOG_MIN;
-uint16_t max_x = ANALOG_MAX;
-uint16_t center_y = ANALOG_CENTER;
-uint16_t min_y = ANALOG_MIN;
-uint16_t max_y = ANALOG_MAX;
+int16_t center_x = ANALOG_CENTER;
+int16_t min_x = ANALOG_MIN;
+int16_t max_x = ANALOG_MAX;
+int16_t center_y = ANALOG_CENTER;
+int16_t min_y = ANALOG_MIN;
+int16_t max_y = ANALOG_MAX;
 
 // Scale x from `in` range to `out` range
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
@@ -202,7 +202,7 @@ bool poll_joystick() {
 
     // X
     if(SIXPIN_ENABLED){
-    currentXState = analog_to_joystick_value(get_sixpin_count(0), min_x, center_x, max_x);
+    currentXState = analog_to_joystick_value(get_sixpin_count(0), min_x+abs(min_x), center_x+abs(min_x), max_x+abs(min_x));
     }
     else{
     currentXState = analog_to_joystick_value(get_analog_raw(ANALOG_X), min_x, center_x, max_x);
@@ -219,7 +219,7 @@ bool poll_joystick() {
 
     // Y
     if(SIXPIN_ENABLED){
-    currentYState = analog_to_joystick_value(get_sixpin_count(1), min_y, center_y, max_y);;
+    currentYState = analog_to_joystick_value(get_sixpin_count(1), min_y+abs(min_y), center_y+abs(min_y), max_y+abs(min_y));;
     }
     else{
     currentYState = analog_to_joystick_value(get_analog_raw(ANALOG_Y), min_y, center_y, max_y);

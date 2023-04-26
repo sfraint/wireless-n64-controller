@@ -133,14 +133,12 @@ extern uint32_t physicalButtons[NUM_OF_BUTTONS];
 
 
 // Analog input center, range and SIXPIN factor
-extern uint16_t center_x;
-extern uint16_t min_x;
-extern uint16_t max_x;
-extern uint16_t factor_x;
-extern uint16_t center_y;
-extern uint16_t min_y;
-extern uint16_t max_y;
-extern uint16_t factor_y;
+extern int16_t center_x;
+extern int16_t min_x;
+extern int16_t max_x;
+extern int16_t center_y;
+extern int16_t min_y;
+extern int16_t max_y;
 
 uint16_t get_analog_raw(adc1_channel_t pin);
 bool poll_buttons();
