@@ -46,8 +46,10 @@ You will need to flash the software for this project on your ESP32 microcontroll
 
 If you are using and OEM controller the software must be updated to enable SIXPIN mode before building:
 
+```
 input_poll.h - #define SIXPIN_ENABLED  1
- 
+```
+
 See [software readme](software/README.md) for more details.
 
 ### 2. Assemble the components
