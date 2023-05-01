@@ -15,8 +15,6 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
-
-
 // LED mode and misc related status indicators
 uint32_t led_mode = 0;
 bool bt_connected = false;
@@ -30,13 +28,10 @@ bool startup_routine_running = true;
 
 BleGamepad bleGamepad;
 xQueueHandle gpio_evt_queue = NULL; // Button-press event queue
-// When an edge change is detected used to count movement
+// For 6-pin joysticks: count movement when an edge change is detected
 int countx = 0;
 int county = 0;
-// Setup Var to hold Factor to move joystick to positive range
-uint16_t factor_x = 0;
-uint16_t factor_y = 0;
-// X Interrupt Hook 
+// For 6-pin joysticks: X Interrupt Hook 
 static void IRAM_ATTR gpiox_isr_handler(void* arg)
 {
     uint32_t gpio_num = (uint32_t) arg;
@@ -48,7 +43,7 @@ static void IRAM_ATTR gpiox_isr_handler(void* arg)
                     }    
                      
 }
-// Y Interrupt Hook
+// For 6-pin joysticks: Y Interrupt Hook
 static void IRAM_ATTR gpioy_isr_handler(void* arg)
 {
        uint32_t gpio_num = (uint32_t) arg;
@@ -60,19 +55,6 @@ static void IRAM_ATTR gpioy_isr_handler(void* arg)
                     } 
 }
 
-
-//Return countx and county values 0 = countx
-uint16_t get_sixpin_count(int32_t type) {
-    if(type == 0){
-        //printf("X: %d\n",countx);
-        return countx+abs(min_x);
-    }
-    else{
-        //printf("X: %d\n",county);
-        return county+abs(min_y);
-    }
-     
-}
 // Setup specified pin number as pulled-down, input pin
 void setup_input_pin(uint32_t pin) {
     gpio_config_t io_conf;
@@ -107,7 +89,7 @@ void setup_gpio()
     adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
     }   
 
-    // SIXPIN Joystick setup
+    // For 6-pin joysticks: Joystick setup
     if(SIXPIN_ENABLED){
         //zero-initialize the config structure.
         gpio_config_t io_conf = {};
@@ -136,8 +118,6 @@ void setup_gpio()
         max_y = SIXPIN_ANALOG_MAX;
         center_x = SIXPIN_ANALOG_CENTER;
         center_y = SIXPIN_ANALOG_CENTER;
-        factor_x = 40;
-        factor_y = 40;
     }
     else{
     adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);

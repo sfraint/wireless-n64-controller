@@ -202,7 +202,7 @@ bool poll_joystick() {
 
     // X
     if(SIXPIN_ENABLED){
-    currentXState = analog_to_joystick_value(get_sixpin_count(0), min_x+abs(min_x), center_x+abs(min_x), max_x+abs(min_x));
+    currentXState = analog_to_joystick_value(countx+abs(min_x), min_x+abs(min_x), center_x+abs(min_x), max_x+abs(min_x));
     }
     else{
     currentXState = analog_to_joystick_value(get_analog_raw(ANALOG_X), min_x, center_x, max_x);
@@ -219,7 +219,7 @@ bool poll_joystick() {
 
     // Y
     if(SIXPIN_ENABLED){
-    currentYState = analog_to_joystick_value(get_sixpin_count(1), min_y+abs(min_y), center_y+abs(min_y), max_y+abs(min_y));;
+    currentYState = analog_to_joystick_value(county+abs(min_y), min_y+abs(min_y), center_y+abs(min_y), max_y+abs(min_y));;
     }
     else{
     currentYState = analog_to_joystick_value(get_analog_raw(ANALOG_Y), min_y, center_y, max_y);

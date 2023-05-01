@@ -22,16 +22,13 @@ extern uint32_t led_mode;
 #define STORAGE_KEY_X_MIN      "min_x"
 #define STORAGE_KEY_X_CENTER   "center_x"
 #define STORAGE_KEY_X_MAX      "max_x"
-#define STORAGE_KEY_X_FACTOR   "factor_x"
 #define STORAGE_KEY_Y_MIN      "min_y"
 #define STORAGE_KEY_Y_CENTER   "center_y"
 #define STORAGE_KEY_Y_MAX      "max_y"
-#define STORAGE_KEY_Y_FACTOR   "factor_y"
 
 extern BleGamepad bleGamepad;
 
 extern xQueueHandle gpio_evt_queue; // Button-press event queue
-uint16_t get_sixpin_count(int type);
 
 #endif
 

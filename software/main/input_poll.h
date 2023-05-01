@@ -35,9 +35,9 @@
 // GPIO 34
 #define ANALOG_Y             ADC1_CHANNEL_6
 
-// 6-Pin OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
+// For 6-pin joysticks: OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
 //Enable SIXPIN Stick - If set to 0 then four pin analog enabled
-#define SIXPIN_ENABLED  0
+#define SIXPIN_ENABLED  1
 #define ESP_INTR_FLAG_DEFAULT 0
 // GPIO 39
 #define SIXPIN_ANALOG_X     39
@@ -132,13 +132,15 @@ extern uint32_t dpadPins[4];
 extern uint32_t physicalButtons[NUM_OF_BUTTONS];
 
 
-// Analog input center, range and SIXPIN factor
+// Analog input center, range and count for 6-pin joysticks:
 extern int16_t center_x;
 extern int16_t min_x;
 extern int16_t max_x;
+extern int countx;
 extern int16_t center_y;
 extern int16_t min_y;
 extern int16_t max_y;
+extern int county;
 
 uint16_t get_analog_raw(adc1_channel_t pin);
 bool poll_buttons();
