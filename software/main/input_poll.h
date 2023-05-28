@@ -24,23 +24,45 @@
 #define BATTERY_LEVEL_FULL   2355
 
 // Button state for gamepad buttons
-#define NUM_OF_BUTTONS_RIGHT 6
-#define NUM_OF_BUTTONS       13
+#define NUM_OF_BUTTONS_RIGHT 5
+#define NUM_OF_BUTTONS       11
 // "Soft" buttons are not physical buttons, e.g. could be triggered by button combos, simulating things like SELECT
 #define NUM_OF_SOFT_BUTTONS  3
+
+// 4 PIN Analog Stick config
 // GPIO 39
 #define ANALOG_X             ADC1_CHANNEL_3
 // GPIO 34
 #define ANALOG_Y             ADC1_CHANNEL_6
+
+// For 6-pin joysticks: OEM analog stick setup - Not actually analog, uses optical sensors monitoring leading edge with inturrupts
+//Enable SIXPIN Stick - If set to 0 then four pin analog enabled
+#define SIXPIN_ENABLED  0
+#define ESP_INTR_FLAG_DEFAULT 0
+// GPIO 39
+#define SIXPIN_ANALOG_X     39
 // GPIO 35
-#define ANALOG_BAT           ADC1_CHANNEL_7
+#define SIXPIN_ANALOG_XQ    35
+// GPIO 34
+#define SIXPIN_ANALOG_Y     34
+// GPIO 34
+#define SIXPIN_ANALOG_YQ    13
+#define GPIO_INPUT_PIN_SEL  ((1ULL<<SIXPIN_ANALOG_X) | (1ULL<<SIXPIN_ANALOG_Y)| (1ULL<<SIXPIN_ANALOG_XQ)| (1ULL<<SIXPIN_ANALOG_YQ))
+// Approx. max ADC readings for SIXPIN joystick potentiometer
+#define SIXPIN_ANALOG_MAX   130 
+#define SIXPIN_ANALOG_CENTER     (SIXPIN_ANALOG_MAX/2)
+// Multiplier to apply to scaled analog readings
+// Should be higher than 1 so the max value can be hit consistently
+#define SIXPIN_ANALOG_OVERSCALE  1.1
+
 // TODO add calibration function
 // Amount to add to analog readings (pre scaling)
-#define ANALOG_OFFSET_X        125
-#define ANALOG_OFFSET_Y        165
+#define ANALOG_OFFSET_X     125
+#define ANALOG_OFFSET_Y     165
 // Amount of analog change to allow before calling the value changed (post scaling)
-#define ANALOG_DRIFT         200
-
+#define ANALOG_DRIFT        200
+// GPIO 35
+#define ANALOG_BAT           ADC1_CHANNEL_7
 // Define which pins are used for each button
 // Right side pins
 #define BTN_START_PIN      36
@@ -48,7 +70,6 @@
 #define BTN_L_PIN          32
 #define BTN_B_PIN          14
 #define BTN_A_PIN          12
-#define BTN_IDK1_PIN       13
 // Left side pins
 #define BTN_R_PIN          23
 #define BTN_C_DOWN_PIN     22
@@ -56,7 +77,6 @@
 #define BTN_C_UP_PIN       19
 #define BTN_C_RIGHT_PIN    18
 #define BTN_IDK2_PIN       21
-#define BTN_IDK3_PIN       35
 // "Soft" buttons logical button number reference
 // Number reference points to position in the `buttonPins` array in input_poll.cpp
 #define BTN_SOFT_SELECT    6
@@ -79,7 +99,7 @@
 
 // Approx. min, centered, and max ADC readings for joystick potentiometers
 #define ANALOG_MIN        0
-#define ANALOG_MAX        3900
+#define ANALOG_MAX        3900 
 #define ANALOG_CENTER     (ANALOG_MAX/2)
 // Multiplier to apply to scaled analog readings
 // Should be higher than 1 so the max value can be hit consistently
@@ -112,14 +132,15 @@ extern uint32_t dpadPins[4];
 extern uint32_t physicalButtons[NUM_OF_BUTTONS];
 
 
-// Analog input center and range
-extern uint16_t center_x;
-extern uint16_t min_x;
-extern uint16_t max_x;
-extern uint16_t center_y;
-extern uint16_t min_y;
-extern uint16_t max_y;
-
+// Analog input center, range and count for 6-pin joysticks:
+extern int16_t center_x;
+extern int16_t min_x;
+extern int16_t max_x;
+extern int countx;
+extern int16_t center_y;
+extern int16_t min_y;
+extern int16_t max_y;
+extern int county;
 
 uint16_t get_analog_raw(adc1_channel_t pin);
 bool poll_buttons();

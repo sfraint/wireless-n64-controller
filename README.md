@@ -1,14 +1,14 @@
 # wireless-n64-controller
 This project and its documentation is a Work-In-Progress. I'm still working on writing everything down and working out kinks in the design files and prototypes.
 
-**The idea is to publish the design files and software I used to upgrade a cheap, wired N64 controller to a wireless, Bluetooth controller**. Hopefully these published files can assist others in completing similar projects.
+**The idea is to publish the design files and software used to upgrade an OEM or cheap, wired N64 controller to a wireless, Bluetooth controller**. Hopefully these published files can assist others in completing similar projects.
 
 <img src=images/controller_prototype.jpg width=1024>
 
 ## Motivation
-When this project was started, no original-form-factor N64 wireless controllers were available for purchase. There were some two-handle controllers, inspired by N64 original controllers, but none with the original three-handle setup.
+When this project was started, no original-form-factor bluetooth N64 wireless controllers were available for purchase. There were some two-handle controllers, inspired by N64 original controllers, but none with the original three-handle setup.
 
-The main goal of this project was to upgrade an existing, cheap three-handle N64 wired controller to use bluetooth, so it could be used with a PC and/or Raspberry Pi.
+The main goal of this project was to upgrade an existing OEM or cheap three-handle N64 wired controller to use bluetooth, so it could be used with a PC and/or Raspberry Pi.
 
 ## Operation
 

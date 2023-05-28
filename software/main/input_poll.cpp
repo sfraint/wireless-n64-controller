@@ -27,9 +27,7 @@ uint32_t buttonPins[NUM_OF_BUTTONS] = {
     BTN_Z_PIN,
     BTN_L_PIN,
     BTN_R_PIN,
-    BTN_IDK1_PIN,
-    BTN_IDK2_PIN,
-    BTN_IDK3_PIN
+    BTN_IDK2_PIN
 };
 
 // "Soft" buttons
@@ -44,6 +42,7 @@ uint32_t previousButtonStates[NUM_OF_BUTTONS];
 uint32_t currentButtonStates[NUM_OF_BUTTONS];
 uint32_t previousSoftButtonStates[NUM_OF_SOFT_BUTTONS];
 uint32_t currentSoftButtonStates[NUM_OF_SOFT_BUTTONS];
+
 int16_t previousXState;
 int16_t currentXState;
 int16_t previousYState;
@@ -57,17 +56,17 @@ uint32_t dpadPins[4] = {25, 27, 26, 33};
 
 
 // Analog input center and range
-uint16_t center_x = ANALOG_CENTER;
-uint16_t min_x = ANALOG_MIN;
-uint16_t max_x = ANALOG_MAX;
-uint16_t center_y = ANALOG_CENTER;
-uint16_t min_y = ANALOG_MIN;
-uint16_t max_y = ANALOG_MAX;
-
+int16_t center_x = ANALOG_CENTER;
+int16_t min_x = ANALOG_MIN;
+int16_t max_x = ANALOG_MAX;
+int16_t center_y = ANALOG_CENTER;
+int16_t min_y = ANALOG_MIN;
+int16_t max_y = ANALOG_MAX;
 
 // Scale x from `in` range to `out` range
 int32_t map(int32_t x, int32_t in_min, int32_t in_max, int32_t out_min, int32_t out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    
 }
 
 
@@ -91,14 +90,34 @@ int16_t analog_to_joystick_value(uint16_t raw, uint16_t min, uint16_t med, uint1
 
     // Negative
     if (raw < med) {
-        int32_t joystick_val = map(raw, min, med, JOYSTICK_MIN, 0) * ANALOG_OVERSCALE;
+        int32_t joystick_val = map(raw, min, med, JOYSTICK_MIN, 0) ;
+       // printf("negative joystick_val val before scaling : %d \n", joystick_val);
+        if(SIXPIN_ENABLED)
+        {
+        joystick_val = joystick_val * SIXPIN_ANALOG_OVERSCALE;
+        }
+        else{
+        joystick_val = joystick_val * ANALOG_OVERSCALE;
+        }
+        //printf("joystick_val val after scaling: %d \n", joystick_val);
         if (joystick_val < JOYSTICK_MIN) return JOYSTICK_MIN;
+        
         return (int16_t) joystick_val;
     }
 
     // Positive
-    int32_t joystick_val = map(raw, med, max, 0, JOYSTICK_MAX) * ANALOG_OVERSCALE;
+    int32_t joystick_val = map(raw, med, max, 0, JOYSTICK_MAX);
+    //printf("positive joystick_val valbefore scaling : %d \n", joystick_val);
+    if(SIXPIN_ENABLED)
+    {
+        joystick_val = joystick_val * SIXPIN_ANALOG_OVERSCALE;
+    }
+    else{
+        joystick_val = joystick_val * ANALOG_OVERSCALE;
+    }
+    //printf("joystick_val val after scaling: %d \n", joystick_val);
     if (joystick_val > JOYSTICK_MAX) return JOYSTICK_MAX;
+
     return (int16_t) joystick_val;
 }
 
@@ -182,7 +201,12 @@ bool poll_joystick() {
     bool changed = false;
 
     // X
+    if(SIXPIN_ENABLED){
+    currentXState = analog_to_joystick_value(countx+abs(min_x), min_x+abs(min_x), center_x+abs(min_x), max_x+abs(min_x));
+    }
+    else{
     currentXState = analog_to_joystick_value(get_analog_raw(ANALOG_X), min_x, center_x, max_x);
+    }
     if ((currentXState > 0 && currentXState < JOYSTICK_DEADZONE) || (currentXState < 0 && currentXState > (-1 * JOYSTICK_DEADZONE))) {
         currentXState = 0;
     }
@@ -194,7 +218,12 @@ bool poll_joystick() {
     }
 
     // Y
+    if(SIXPIN_ENABLED){
+    currentYState = analog_to_joystick_value(county+abs(min_y), min_y+abs(min_y), center_y+abs(min_y), max_y+abs(min_y));;
+    }
+    else{
     currentYState = analog_to_joystick_value(get_analog_raw(ANALOG_Y), min_y, center_y, max_y);
+    }
     if ((currentYState > 0 && currentYState < JOYSTICK_DEADZONE) || (currentYState < 0 && currentYState > (-1 * JOYSTICK_DEADZONE))) {
         currentYState = 0;
     }
@@ -231,10 +260,11 @@ void input_poll_loop(void* args)
         bool changed = false;
         
         // Battery
-        if (ENABLE_BATTERY_CHECK) {
-            bleGamepad.setBatteryLevel(get_battery_level());
+        if (!SIXPIN_ENABLED){
+            if (ENABLE_BATTERY_CHECK) {
+                bleGamepad.setBatteryLevel(get_battery_level());
+            }
         }
-
         // Joystick
         bool joystick_changed = poll_joystick();
         changed |= joystick_changed;

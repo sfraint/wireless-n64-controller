@@ -10,6 +10,7 @@ See the [BOM for more details and some example-component links](BOM.md), but you
 
 * Base N64 controller you plan to modify.
    * I'm not sure how standardized N64 controller internals are, so it is probably a good idea to confirm the measurements of your controller match up with the spacing of the PCB mounting/securing holes.
+   * OEM controllers use a 6 pin connector compared to the cheaper alternatives which use a 4 pin. Additional steps are required to configure the software as well as modifications to the PCB for an OEM 6 pin controller.
 * ESP32 microcontroller
 * AAA terminals
 * LiPo battery
@@ -42,7 +43,13 @@ Alternatively, you could skip using a battery pak and directly plug/wire a batte
 ### 1. Program the microcontroller
 
 You will need to flash the software for this project on your ESP32 microcontroller. After `ESP-IDF` is setup on your PC, you can connect the microcontroller to your PC via USB and build and flash the software.
- 
+
+If you are using and OEM controller the software must be updated to enable SIXPIN mode before building:
+
+```
+input_poll.h - #define SIXPIN_ENABLED  1
+```
+
 See [software readme](software/README.md) for more details.
 
 ### 2. Assemble the components
@@ -61,9 +68,37 @@ Components:
 
 4. **2-pin cables**: Solder one 2-pin JST cable to each external board: right trigger, left trigger, and Z board (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). Each board has two pads to solder to, and it doesn't matter which wire is soldered to which pad. You will need to cut or desolder the existing wires running to these boards.
 
-5. **4-pin header**: Solder the 4-pin PH header/connector for `Analog`. I solder this so the connector opening is facing downward.
+5. **4-pin/6-pin header**: Solder the 4-pin PH header/connector for non OEM controllers `Analog`. I solder this so the connector opening is facing downward.
 
    <img src=images/4pin_header.jpg width=360>
+
+   If using the OEM controller, the 6-pin connector needs modifying to work with the current PCB until this is updated. Carefully bend two of the pins up so the header/connector fits into the 4 pin position on the PCB. Then two additional wires are required to be soldered from these bent pins to the correct ESP32 Pins on the PCB (6 -> Pin 13,5 -> Pin 35) as per the picture below:
+
+   <img src=images/6pin_header.jpg width=360>
+
+   Additionally, for the 6 Pin connectors the wires from the joystick need swapping around in the 6pin header to match the PCB (a small screwdriver can be used to lift the holding clips and release the wires from the connector):
+
+   <img src=images/6pin_pcb.png width=360>
+
+   * Pin 1 - X
+   * Pin 2 - Power 
+   * Pin 3 - Ground
+   * Pin 4 - XQ
+   * Pin 5 - Y
+   * Pin 6 - YQ
+
+   These should be reordered to:
+
+   * Pin 1 - power
+   * Pin 2 - Y 
+   * Pin 3 - Ground
+   * Pin 4 - X
+   * Pin 5 - XQ
+   * Pin 6 - YQ
+   
+   (More information can be found here: https://dpedu.io/article/2015-03-11/nintendo-64-joystick-pinout-arduino)
+
+   <img src=images/6pin_header_after.jpg width=360>
 
 6. **4-pin cables**: Solder the 4-pin PH cable to the analog joystick board (you should cut down the length of the cable before hand so there isn't a ton of extra slack taking up space). You will need to cut or desolder the existing wires running to this board - note which wires are labeled as V, X, G, and Y before removing them. Take care to solder the appropriate PH cable to the appropriate pad on the joystick board; on my board the pins were X, Gnd, Y, and V+ (from top to bottom) but yours may be different.
 

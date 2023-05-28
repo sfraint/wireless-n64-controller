@@ -15,7 +15,6 @@
 #include "driver/adc.h"
 #include "driver/gpio.h"
 
-
 // LED mode and misc related status indicators
 uint32_t led_mode = 0;
 bool bt_connected = false;
@@ -23,12 +22,38 @@ bool bt_connected = false;
 #define STATE_STARTUP      0
 #define STATE_CALIBRATION  1
 #define STATE_RUNNING      2
+
 uint32_t current_state = STATE_STARTUP;
 bool startup_routine_running = true;
 
 BleGamepad bleGamepad;
 xQueueHandle gpio_evt_queue = NULL; // Button-press event queue
-
+// For 6-pin joysticks: count movement when an edge change is detected
+int countx = 0;
+int county = 0;
+// For 6-pin joysticks: X Interrupt Hook 
+static void IRAM_ATTR gpiox_isr_handler(void* arg)
+{
+    uint32_t gpio_num = (uint32_t) arg;
+    if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_X) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_XQ)){ 
+                        countx++;
+                    }
+                    else{
+                        countx--;
+                    }    
+                     
+}
+// For 6-pin joysticks: Y Interrupt Hook
+static void IRAM_ATTR gpioy_isr_handler(void* arg)
+{
+       uint32_t gpio_num = (uint32_t) arg;
+    if(gpio_get_level((gpio_num_t) SIXPIN_ANALOG_Y) == gpio_get_level((gpio_num_t) SIXPIN_ANALOG_YQ)){ 
+                        county--;
+                    }
+                    else{
+                        county++;
+                    } 
+}
 
 // Setup specified pin number as pulled-down, input pin
 void setup_input_pin(uint32_t pin) {
@@ -57,12 +82,47 @@ void setup_gpio()
         previousDpadStates[i] = 0;
         currentDpadStates[i] =  0;
     }
-    // Analog in
+
+    // Battery Monitor, Pin also used with 6 pin Joystick, therefore only availble with 4 pin joysticks
+    if(!SIXPIN_ENABLED){
     adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
+    }   
+
+    // For 6-pin joysticks: Joystick setup
+    if(SIXPIN_ENABLED){
+        //zero-initialize the config structure.
+        gpio_config_t io_conf = {};
+        //disable pull-down mode
+        io_conf.pull_down_en = (gpio_pulldown_t) 0;
+        //interrupt of any edge
+        io_conf.intr_type = GPIO_INTR_ANYEDGE;
+        //bit mask of the pins
+        io_conf.pin_bit_mask = GPIO_INPUT_PIN_SEL;
+        //set as input mode
+        io_conf.mode = GPIO_MODE_INPUT;
+        //disable pull-up mode
+        io_conf.pull_up_en = (gpio_pullup_t) 0;
+        gpio_config(&io_conf);
+        
+        //SIXPIN Joystick Interrupts and Handler setup
+        //install gpio isr service
+        gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
+        //hook isr handler for specific gpio pin
+        gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_X, gpiox_isr_handler, (void*) SIXPIN_ANALOG_X);
+        //hook isr handler for specific gpio pin
+        gpio_isr_handler_add((gpio_num_t) SIXPIN_ANALOG_Y, gpioy_isr_handler, (void*) SIXPIN_ANALOG_Y);
+
+        //Adjust max ADC reading for SIXPIN joystick potentiometers
+        max_x = SIXPIN_ANALOG_MAX; 
+        max_y = SIXPIN_ANALOG_MAX;
+        center_x = SIXPIN_ANALOG_CENTER;
+        center_y = SIXPIN_ANALOG_CENTER;
+    }
+    else{
     adc1_config_channel_atten(ANALOG_X, ADC_ATTEN_DB_11);
     adc1_config_channel_atten(ANALOG_Y, ADC_ATTEN_DB_11);
-    adc1_config_channel_atten(ANALOG_BAT, ADC_ATTEN_DB_11);
-
+    }
     // Other IO
     gpio_config_t io_conf;
     // Button feedback LED output
@@ -203,30 +263,35 @@ extern "C" {
 }
 
 
-// Calibrate analog X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~5 seconds to determine range.
+// Calibrate analog X-Y inputs and optionally write to persistent storage. Uses initial values as "centered", then monitors min and max values for ~10 seconds to determine range. 
 void calibrate(bool write_to_storage) {
     const TickType_t xDelay = 10 / portTICK_PERIOD_MS;  // 10ms
 
-    center_x = get_analog_raw(ANALOG_X);
+    if (SIXPIN_ENABLED){center_x = 0;} else{center_x = get_analog_raw(ANALOG_X);};
     min_x = center_x;
     max_x = center_x;
 
-    center_y = get_analog_raw(ANALOG_Y);
+    if (SIXPIN_ENABLED){center_y = 0;} else{center_y = get_analog_raw(ANALOG_Y);};
     min_y = center_y;
     max_y = center_y;
 
-    // Read extreme values for ~5 seconds
-    for (int i = 0; i < 500; i++) {
-        uint16_t x = get_analog_raw(ANALOG_X);
+    // Read extreme values for ~10 seconds
+    for (int i = 0; i < 1000; i++) {
+        int32_t  x;
+        if (SIXPIN_ENABLED) {x = countx;} else{x = get_analog_raw(ANALOG_X);};
+        
         if (x < min_x) min_x = x;
         if (x > max_x) max_x = x;
 
-        uint16_t y = get_analog_raw(ANALOG_Y);
+        int32_t  y;
+        if (SIXPIN_ENABLED) {y = county;} else{y = get_analog_raw(ANALOG_Y);};
+       
         if (y < min_y) min_y = y;
         if (y > max_y) max_y = y;
 
         vTaskDelay(xDelay);
     }
+
     printf("Calibration results:\n");
     printf("X (left, center, right): %d, %d, %d\n", min_x, center_x, max_x);
     printf("Y (up, center, down):    %d, %d, %d\n", min_y, center_y, max_y);
