@@ -88,13 +88,12 @@ Components:
    * Pin 6 - YQ
 
    These should be reordered to:
-
-   * Pin 1 - power
-   * Pin 2 - Y 
-   * Pin 3 - Ground
-   * Pin 4 - X
-   * Pin 5 - XQ
-   * Pin 6 - YQ
+    * Pin 1 - power
+    * Pin 2 - YQ
+    * Pin 3 - Ground
+    * Pin 4 - X
+    * Pin 5 - Y
+    * Pin 6 - XQ
    
    (More information can be found here: https://dpedu.io/article/2015-03-11/nintendo-64-joystick-pinout-arduino)
 
