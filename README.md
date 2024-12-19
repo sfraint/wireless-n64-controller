@@ -1,4 +1,14 @@
 # wireless-n64-controller
+
+## SMD Version
+
+**This branch is for the SMD version of the controller. This is even more experimental than the original.**
+
+**Much of the documentation is out-dated for this version, but publishing this branch for others to look at until I can polish it a bit.**
+
+
+## Overview
+
 This project and its documentation is a Work-In-Progress. I'm still working on writing everything down and working out kinks in the design files and prototypes.
 
 **The idea is to publish the design files and software used to upgrade an OEM or cheap, wired N64 controller to a wireless, Bluetooth controller**. Hopefully these published files can assist others in completing similar projects.
